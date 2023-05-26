@@ -1,28 +1,171 @@
-.App {
-  text-align: center;
+body {
+  margin: 0;
+  font-family: 'League Spartan';
+  width: 100vw;
+  height: 100vh;
+  background-color: #091820;
 }
 
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+main {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  width: 100vw;
+  height: 100vh;
+}
+
+h1 {
+  color: white;
+  margin-left: 4%;
+}
+
+p {
+  color: white;
+  margin-left: 4%;
+}
+.container {
+  display: flex;
+  flex-direction: row;
+  align-content: stretch;
+  margin: 0px;
+  height: inherit;
+  width: inherit;
+}
+
+.name {
+  display: inline-block;
+  text-decoration: none;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  text-align: left;
+  margin: 2%;
+  width: 25%;
+  font-size: 12vh;
+  font-weight: 1000;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+div.sideNav {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  align-content: stretch;
+  margin-left: 2%;
+  width: 25%;
+  height: 80%;
+  padding: 10px;
+  padding-top: 40px;
+  font-size: 4vh;
+  border-radius: 7px;
+  background-color: #224B4C;
+  background-image: url("https://media.discordapp.net/attachments/900291375801720837/1110619823995637810/IMG_7164.png?width=440&height=729");
+  background-position: center;
+  background-size: cover;
+  color: white;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.nav {
+  text-decoration: none;
+  color: white;
+  flex: auto;
+  cursor: pointer;
 }
+
+
+button.decide {
+  font-size: 4vh;
+  border: none;
+  padding: 15px;
+  width: 75%;
+  margin-top: 50px;
+  margin-bottom: 25px;
+  font-family: "League Spartan";
+  background-color: #101B29;
+  color: white;
+  cursor: pointer;
+}
+
+div.topNav {
+  position: absolute;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: right;
+  align-items: center;
+  border-radius: 7px;
+  right: 0px;
+  top: 0px;
+  margin: 1%;
+  padding: 10px;
+  width: 20%;
+  height: 10%;
+  overflow: hidden;
+  font-size: 3vh;
+  background-image: url("https://cdn.discordapp.com/attachments/900291375801720837/1110619018282405938/Rectangle_9.png");
+  background-position: center;
+  background-size: cover;
+  color: white;
+
+}
+
+div.login {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+div.register {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+div.circle {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+  background-color: white;
+}
+
+div.favourites {
+  flex-grow: 3;
+  margin-left: 2%;
+  width: 25%;
+  height: 30%;
+  padding: 20px;
+  border-radius: 7px;
+  font-size: 4vh;
+  text-align: left;
+  background-image: url("https://media.discordapp.net/attachments/900291375801720837/1110619823332929546/IMG_7166.png?width=1027&height=730");
+  background-position: center;
+  background-size: cover;
+  background-color: #224B4C;
+  color: white;
+  cursor: pointer;
+}
+
+div.history {
+  flex-grow: 3;
+  margin-left: 2%;
+  margin-right: 2%;
+  width: 25%;
+  height: 30%;
+  padding: 20px;
+  border-radius: 7px;
+  font-size: 4vh;
+  text-align: left;
+  background-color: #224B4C;
+  background-image: url("https://media.discordapp.net/attachments/900291375801720837/1110619823630721135/IMG_7165.png?width=1027&height=730");
+  background-position: center;
+  background-size: cover;
+  color: white;
+  cursor: pointer;
+}
+
+.links {
+  color: #ffd28e;
+}
+
+
