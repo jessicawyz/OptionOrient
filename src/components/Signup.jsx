@@ -35,16 +35,16 @@ const Signup = () => {
         </p>
       </div>
       <form onSubmit={handleSubmit}>
-        <div className='tw-flex tw-flex-col tw-py-2 tw-text-white'>
-          <label className='tw-py-2 tw-font-medium'>Email Address</label>
+        <div className='tw-flex tw-flex-col tw-py-2'>
+          <label className='tw-py-2 tw-font-medium tw-text-white'>Email Address</label>
           <input
             onChange={(e) => setEmail(e.target.value)}
             className='tw-border tw-p-3'
             type='email'
           />
         </div>
-        <div className='tw-flex tw-flex-col tw-py-2 tw-text-white'>
-          <label className='tw-py-2 tw-font-medium'>Password</label>
+        <div className='tw-flex tw-flex-col tw-py-2 '>
+          <label className='tw-py-2 tw-font-medium tw-text-white'>Password</label>
           <input
             onChange={(e) => setPassword(e.target.value)}
             className='tw-border tw-p-3'

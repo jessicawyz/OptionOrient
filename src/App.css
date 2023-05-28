@@ -18,17 +18,19 @@ main {
   height: 100vh;
 }
 
-h1 {
-  color: white;
-  margin-left: 4%;
-}
-
 p {
   color: white;
-  margin-left: 4%;
 }
 
+h1 {
+  color: white;
+}
 
+.nfText {
+  color: white;
+  margin-left: 2%;
+  font-size: 25px;
+}
 
 
 .container {
@@ -176,6 +178,7 @@ div.history {
 .links {
   color: #ffd28e;
   cursor: pointer;
+  text-decoration: underline;
 }
 
 
