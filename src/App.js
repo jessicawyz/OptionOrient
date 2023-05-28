@@ -1,50 +1,50 @@
-//import { useState } from 'react'
 import React from 'react';
-import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { AuthContextProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 import "./App.css"
-import Favourites from "./components/Favourites";
-import History from "./components/History";
-import SideNav from "./components/SideNav";
-import TopNav from "./components/TopNav";
+import Signin from './components/Signin';
+import Signup from './components/Signup';
 import Layout from "./pages/Layout";
+import Home from "./pages/Home";
 import Decide from "./pages/Decide";
 import NotFound from "./pages/NotFound";
 
 
 function App() {
   return (
-    <BrowserRouter>
-      {/*base layout with title*/}
+    
+    <AuthContextProvider>
       <Routes>
-          <Route path="/" element={<Layout />}>
-          {/*all other pages*/}
-          {/*Home*/}
-          <Route index element={
-            <div className="Home">
-              <header>
-              </header>
-
-              <main>
-                <div className='container'>
-                  <SideNav />
-                  <Favourites />
-                  <History />
-                  <TopNav />
-                </div>
-                {/*will add image later*/}
-                <div className="corner"></div>
-              </main>
-            </div>
-          } />
+        <Route path="/" element={<Layout />}>
+          {/*Login*/}
+          <Route index element={<Signin />} />
+          <Route path='/signup' element={<Signup />} />
+          <Route
+            path='/home'
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          
           {/*decide page*/}
-          <Route path="/decide" element={<Decide />} />
+          <Route 
+            path="/decide" 
+            element={
+              <ProtectedRoute>
+                <Decide />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/notFound" element={<NotFound />} />
 
         </Route>
       </Routes>
-    </BrowserRouter>
+    </AuthContextProvider>
+    
   );
 }
 

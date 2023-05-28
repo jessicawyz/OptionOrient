@@ -6,7 +6,7 @@ export default function NotFound() {
     return (
         <>
             <h1>OOPS! This page is incomplete!</h1>
-            <p>return to <Link to="/" className="links">home page</Link></p>
+            <p>return to <Link to="/home" className="links">home page</Link></p>
         </>
     )
 }

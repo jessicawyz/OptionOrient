@@ -5,7 +5,7 @@ import React from 'react';
 export default function Layout() {
     return (
         <>
-            <Link to="/" className="name">Option <br />Orient</Link>
+            <Link to="/home" className="name">Option <br />Orient</Link>
 
             <Outlet />
         </>
