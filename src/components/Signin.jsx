@@ -49,7 +49,7 @@ const Signin = () => {
       </form>
       <p className='tw-py-2'>
           Forgot password?{' '}
-          <Link to='/notFound' className='links'>
+          <Link to='/password-reset' className='links'>
             Reset Password.
           </Link>
         </p>

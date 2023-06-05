@@ -2,10 +2,12 @@ import React from 'react';
 import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { AuthContextProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import './firebase'; // Import the Firebase initialization code
 
 import "./App.css"
 import Signin from './components/Signin';
 import Signup from './components/Signup';
+import PasswordReset from './components/PasswordReset';
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import Decide from "./pages/Decide";
@@ -21,6 +23,11 @@ function App() {
           {/*Login*/}
           <Route index element={<Signin />} />
           <Route path='/signup' element={<Signup />} />
+
+          {/* Password Reset */}
+          <Route path="/password-reset" element={<PasswordReset />} />
+
+          {/* Home */}
           <Route
             path='/home'
             element={
