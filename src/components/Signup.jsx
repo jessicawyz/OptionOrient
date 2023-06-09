@@ -1,22 +1,30 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [error, setError] = useState('')
+  const [error, setError] = useState('');
   const { createUser } = UserAuth();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (password.length < 6) {
+      setError('Password should be at least 6 characters');
+      return;
+    }
+
     try {
-      await createUser(email, password);
+      // Create the user account
+      createUser(email, password, username);
       navigate('/home');
-      console.log("success!");
+      console.log('success!');
     } catch (e) {
       setError(e.message);
       console.log(e.message);
@@ -51,6 +59,8 @@ const Signup = () => {
             type='password'
           />
         </div>
+
+        {error && <p className='tw-text-red-500'>{error}</p>}
 
         <div className='tw-flex tw-flex-col tw-py-2'>
           <label className='tw-py-2 tw-font-medium tw-text-white'>Username</label>
