@@ -58,7 +58,7 @@ h1 {
 }
 
 div.sideNav {
-  flex-grow: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -66,10 +66,10 @@ div.sideNav {
   align-content: stretch;
   margin-left: 2%;
   width: 25%;
-  height: 80%;
+  height: 90%;
   padding: 10px;
   padding-top: 40px;
-  font-size: 4vh;
+  font-size: 5vh;
   border-radius: 7px;
   background-color: #224B4C;
   background-image: url("https://media.discordapp.net/attachments/900291375801720837/1110619823995637810/IMG_7164.png?width=440&height=729");
@@ -91,7 +91,7 @@ button.decide {
   border: none;
   padding: 15px;
   width: 75%;
-  margin-top: 50px;
+  margin-top: 20%;
   margin-bottom: 25px;
   font-family: "League Spartan";
   background-color: #101B29;
@@ -139,15 +139,14 @@ div.circle {
   border-radius: 50%;
   background-color: white;
 }
-
-div.favourites {
-  flex-grow: 3;
-  margin-left: 2%;
+.favourites {
+  flex: 2;
+  margin-left: 3%;
   min-width: 25%;
-  height: 30%;
+  height: 35%;
   padding: 20px;
   border-radius: 7px;
-  font-size: 4vh;
+  font-size: 6vh;
   text-align: left;
   background-image: url("https://media.discordapp.net/attachments/900291375801720837/1110619823332929546/IMG_7166.png?width=1027&height=730");
   background-position: center;
@@ -157,16 +156,16 @@ div.favourites {
   cursor: pointer;
 }
 
-div.history {
-  flex-grow: 3;
-  margin-left: 2%;
-  margin-right: 2%;
+.history {
+  flex: 2;
+  margin-left: 3%;
+  margin-right: 3%;
   min-width: 25%;
-  height: 30%;
+  height: 35%;
   padding: 20px;
   border-radius: 7px;
-  font-size: 4vh;
-  text-align: left;
+  font-size: 6vh;
+  text-align: right;
   background-color: #224B4C;
   background-image: url("https://media.discordapp.net/attachments/900291375801720837/1110619823630721135/IMG_7165.png?width=1027&height=730");
   background-position: center;
