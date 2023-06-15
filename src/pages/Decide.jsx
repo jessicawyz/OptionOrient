@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import SideNav from '../components/SideNav';
+import '../css/Decide.css';
+import '../css/App.css';
+import TopNav from '../components/TopNav';
 
 const Decide = () => {
   const [choices, setChoices] = useState([]);
@@ -39,35 +43,50 @@ const Decide = () => {
 
   return (
     <div>
-      <h2 className='tw-py-2 tw-font-medium tw-text-white'>Your Choices</h2>
-      <div className='tw-flex tw-flex-col tw-py-2'>
-        {choices.map((choice, index) => (
-          <p key={index} className='tw-py-2 tw-font-medium tw-text-white'>
-            {choice}
-          </p>
-        ))}
-      </div>
-      <form onSubmit={handleSubmit}>
-        <div className='tw-flex tw-flex-col tw-py-2'>
-          <label className='tw-py-2 tw-font-medium tw-text-white'>Enter Choices</label>
-          <input
-            value={choiceInput}
-            onChange={handleChoiceInput}
-            className='tw-border tw-p-3'
-            type='text'
-          />
-          {errorMessage && <p className='tw-text-red-500'>{errorMessage}</p>}
+    <TopNav />
+    <div className='container-row centerAlign'>
+      <SideNav />
+      <div className='container-col choiceArea'>
+        <div className='decideForm'>
+          <form class="w-full max-w-sm" onSubmit={handleSubmit}>
+            <div className='tw-flex tw-flex-row tw-py-2 tw-text-xl'>
+              <input
+                value={choiceInput}
+                onChange={handleChoiceInput}
+                className='tw-ml-1 tw-flex-1 tw-bg-transparent tw-p-3 tw-text-white tw-mr-5 tw-placeholder-white tw-placeholder-opacity-100 tw-placeholder:font-bold'
+                type='text'
+                placeholder='Enter Choice'
+              />
+              <button type='submit' className='light tw-flex-grow-0 tw-w-32 tw-py-2 tw-px-4 tw-text-black'>
+              Add
+              </button>
+            </div>
+            <div>{errorMessage && <p className='tw-text-red-500'>{errorMessage}</p>}</div>
+            
+          </form>
         </div>
-        <button type='submit' className='tw-py-2 tw-px-4 tw-bg-blue-500 tw-text-white'>
-          Add Choice
+
+        <div className="section choiceBox tw-flex tw-flex-col">
+          <h1 className="tw-font-bold tw-text-3xl tw-text-white">Options</h1>
+          <div className="overflowScroll choiceList">
+            {choices.map((choice, index) => (
+                <p key={index} className='nfText tw-my-2'>
+                  {choice}
+                </p>
+              ))}
+          </div>
+          <button onClick={clearAllChoices} className='dark clickable tw-self-center'>
+            Clear All Choices
+          </button>
+        </div>
+      </div>
+        
+      <div className="container-col centerButton section">
+        <button onClick={generateRandomResult} className='clickable generate'>
+          Make the decision!
         </button>
-      </form>
-      <button onClick={generateRandomResult} className='tw-py-2 tw-px-4 tw-bg-green-500 tw-text-white'>
-        Generate Random Result
-      </button>
-      <button onClick={clearAllChoices} className='tw-py-2 tw-px-4 tw-bg-red-500 tw-text-white'>
-        Clear All Choices
-      </button>
+      </div>
+
       {showModal && (
         <div className='tw-fixed tw-inset-0 tw-flex tw-items-center tw-justify-center tw-bg-gray-800 tw-bg-opacity-75'>
           <div className='tw-bg-white tw-p-6 tw-rounded-lg'>
@@ -79,6 +98,7 @@ const Decide = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

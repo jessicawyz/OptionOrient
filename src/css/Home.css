@@ -1,0 +1,29 @@
+.favourites {
+    min-width: 25%;
+    height: 45%;
+    padding: 20px;
+    border-radius: 7px;
+    font-size: 6vh;
+    text-align: left;
+    background-image: url("https://media.discordapp.net/attachments/900291375801720837/1110619823332929546/IMG_7166.png?width=1027&height=730");
+    background-position: bottom;
+    background-size: cover;
+    background-color: #224B4C;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .history {
+    min-width: 25%;
+    height: 45%;
+    padding: 20px;
+    border-radius: 7px;
+    font-size: 6vh;
+    text-align: right;
+    background-color: #224B4C;
+    background-image: url("https://media.discordapp.net/attachments/900291375801720837/1110619823630721135/IMG_7165.png?width=1027&height=730");
+    background-position: bottom;
+    background-size: cover;
+    color: white;
+    cursor: pointer;
+  }

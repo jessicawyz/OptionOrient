@@ -1,7 +1,8 @@
 import React from 'react';
+import '../css/Home.css';
 
 export default function Favourites() {
     return (
-        <div className="favourites">Favourites</div>
+        <div className="favourites section">Favourites</div>
     )
 }
