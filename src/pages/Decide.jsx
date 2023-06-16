@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import SideNav from '../components/SideNav';
+import '../css/Decide.css';
+import '../css/App.css';
+import TopNav from '../components/TopNav';
 
 const Decide = () => {
   const [options, setOptions] = useState([]);
@@ -21,7 +25,7 @@ const Decide = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!decisionAdded) {
-      setErrorMessage('You need to add a decision first');
+      setErrorMessage('Please add a decision name first');
       return;
     }
     if (optionInput.trim() !== '' && optionInput.trim() !== ' ') {
@@ -34,13 +38,13 @@ const Decide = () => {
       setOptionInput('');
       setErrorMessage('');
     } else {
-      setErrorMessage(optionInput.trim() === '' ? 'You need to enter an option' : '');
+      setErrorMessage(optionInput.trim() === '' ? 'Option provided cannot be empty' : '');
     }
   };
 
   const generateRandomResult = () => {
     if (options.length === 0) {
-      setErrorMessage('Please add options');
+      setErrorMessage('Please add options before generating a decision');
       return;
     }
 
@@ -137,64 +141,75 @@ const Decide = () => {
 
   return (
     <div>
-      {currentDecision === null && <p className='tw-text-red-500'>You need to add a decision first</p>}
-      <h2 className='tw-py-2 tw-font-medium tw-text-white'>Decision Name: {currentDecision?.name}</h2>
+    <TopNav />
+    <div className='container-row centerAlign'>
+      <SideNav />
+      <div className='container-col choiceArea'>
 
-      <button className='tw-py-2 tw-px-4 tw-bg-blue-500 tw-text-white' onClick={addNewDecision}>
-          Add Decision
+        <div className='decideForm'>
+          <form onSubmit={handleSubmit}>
+            <div className='tw-flex tw-flex-row tw-py-2 tw-text-xl'>
+              <input
+                value={optionInput}
+                onChange={handleOptionInput}
+                className='tw-ml-1 tw-flex-1 tw-bg-transparent tw-p-3 tw-text-white tw-mr-5 tw-placeholder-white tw-placeholder-opacity-100 tw-placeholder:font-bold'
+                type='text'
+                placeholder='Enter Option'
+              />
+
+              <button type='submit' className='light tw-flex-grow-0 tw-w-32 tw-py-2 tw-px-4 tw-text-black'>
+              Add
+              </button>
+            </div>
+            <div>
+              {errorMessage && <p className='tw-text-red-500'>{errorMessage}</p>}</div>
+            
+          </form>
+        </div>
+
+        <div className="section choiceBox tw-flex tw-flex-col">
+          <div className='tw-flex tw-flex-row tw-py-2'>
+              <p className='tw-font-bold tw-text-2xl tw-text-white tw-mr-10'>Your Options</p>
+              <p className='tw-font-bold tw-text-2xl tw-text-white'>Probability</p>
+          </div>
+
+          <div className="tw-overflow-y-auto tw-overflow-x-hidden choiceList tw-w-full">
+            {options.map((option, index) => (
+                  <div key={index} className='tw-flex tw-flex-row tw-items-center'>
+                    <p className='nfText tw-my-2 tw-basis-1/2 tw-flex-none'>{option}</p>
+                    <input
+                      type='number'
+                      min={1}
+                      max={100}
+                      value={weights[index]}
+                      onChange={(e) => handleWeightChange(e, index)}
+                      className='nfText tw-basis-3/8 tw-mr-5 tw-text-white tw-bg-transparent tw-text-center'
+                    />
+                    <button className='nfText tw-basis-auto' onClick={() => deleteOption(option)}>Delete</button>
+                  </div>
+              ))}
+          </div>
+          <button onClick={clearAllOptions} className='dark clickable tw-self-center'>
+            Clear All Choices
+          </button>
+        </div>
+      </div>
+        
+      <div className="container-col centerButton section">
+      <h2 className='tw-text-xl tw-py-2 tw-font-bold tw-text-white'>Decision Name: {currentDecision?.name}</h2>
+      <button className='light tw-py-2 tw-w-40 tw-my-5 tw-px-4 tw-text-black' onClick={addNewDecision}>
+          Add Decision Name
         </button>
         {currentDecision && (
-          <button className='tw-py-2 tw-px-4 tw-bg-red-500 tw-text-white' onClick={deleteDecision}>
+          <button className='dark tw-py-2 tw-w-40 tw-px-4 tw-bg-red-500 tw-text-white' onClick={deleteDecision}>
             Delete Decision
           </button>
         )}
 
-      {currentDecision && (
-        <div>
-          <div className='tw-flex tw-flex-row tw-py-2'>
-            <h2 className='tw-font-medium tw-text-white'>Your Options</h2>
-            <h2 className='tw-ml-4 tw-font-medium tw-text-white'>Probability</h2>
-            <div className='tw-flex tw-py-2'>
-      </div>
-          </div>
-          <div className='tw-flex tw-flex-col tw-py-2'>
-            {options.map((option, index) => (
-              <div key={index} className='tw-flex tw-items-center'>
-                <p className='tw-py-2 tw-font-medium tw-text-white'>{option}</p>
-                <input
-                  type='number'
-                  min={1}
-                  max={100}
-                  value={weights[index]}
-                  onChange={(e) => handleWeightChange(e, index)}
-                  className='tw-border tw-p-2 tw-w-16 tw-ml-2'
-                />
-                <button onClick={() => deleteOption(option)}>Delete</button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit}>
-        <div className='tw-flex tw-flex-col tw-py-2'>
-          <label className='tw-py-2 tw-font-medium tw-text-white'>Enter Options</label>
-          <input value={optionInput} onChange={handleOptionInput} className='tw-border tw-p-3' type='text' />
-          {errorMessage && currentDecision !== null && options.length === 0 && <p className='tw-text-red-500'>You need to enter an option</p>}
-          {errorMessage && currentDecision !== null && optionInput === '' && <p className='tw-text-red-500'>Option cannot be empty</p>}
-          {errorMessage && currentDecision !== null && options.includes(optionInput) && <p className='tw-text-red-500'>Option already exists</p>}
-        </div>
-        <button type='submit' className='tw-py-2 tw-px-4 tw-bg-blue-500 tw-text-white'>
-          Add Option
+        <button onClick={generateRandomResult} className='clickable generate'>
+          Make the decision!
         </button>
-      </form>
-
-      <button onClick={generateRandomResult} className='tw-py-2 tw-px-4 tw-bg-green-500 tw-text-white'>
-        Make the decision!
-      </button>
-      <button onClick={clearAllOptions} className='tw-py-2 tw-px-4 tw-bg-red-500 tw-text-white'>
-        Clear All Options
-      </button>
+      </div>
 
       {showModal && (
         <div className='tw-fixed tw-inset-0 tw-flex tw-items-center tw-justify-center tw-bg-gray-800 tw-bg-opacity-75'>
@@ -225,6 +240,7 @@ const Decide = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

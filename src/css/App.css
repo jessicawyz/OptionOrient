@@ -1,9 +1,11 @@
-body {
+html, body {
   margin: 0;
   padding: 0;
   font-family: 'League Spartan';
-  width: 100vw;
+}
+body {
   height: 100vh;
+  width: 100vw;
   background-color: #091820;
 }
 
@@ -14,8 +16,7 @@ code {
 
 main {
   display: flex;
-  width: 100vw;
-  height: 100vh;
+  height: 100%;
 }
 
 p {
@@ -23,7 +24,7 @@ p {
 }
 
 h1 {
-  color: white;
+  color: black;
 }
 
 .nfText {
@@ -33,43 +34,60 @@ h1 {
 }
 
 
-.container {
+.container-row {
   display: flex;
   flex-direction: row;
   margin: 0;
+  padding: 2% 2% 2% 0%;
+  height: 76vh;
+  width: 100%;
+}
+
+.container-col {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
   width: 100%;
   height: 100%;
+  align-content: stretch;
+  justify-content: flex-start;
 }
+
+.section {
+  flex: 2;
+  margin-left: 2%;
+}
+
 
 .name {
   display: inline-block;
   text-decoration: none;
   position: relative;
-  top: 0px;
-  left: 0px;
+  margin: 3vh 2vw -1vh 2vw;
   text-align: left;
-  margin: 2%;
-  width: 25%;
+  height: 20vh;
+  width: 30%;
   font-size: 12vh;
   font-weight: 1000;
   color: white;
   cursor: pointer;
   line-height: 75%;
+  
 }
 
 div.sideNav {
-  flex-grow: 1;
+  flex: 1.2;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   align-content: stretch;
   margin-left: 2%;
-  width: 25%;
-  height: 80%;
+  max-width: 20%;
+  height: 100%;
   padding: 10px;
   padding-top: 40px;
-  font-size: 4vh;
+  font-size: 5vh;
   border-radius: 7px;
   background-color: #224B4C;
   background-image: url("https://media.discordapp.net/attachments/900291375801720837/1110619823995637810/IMG_7164.png?width=440&height=729");
@@ -86,17 +104,28 @@ div.sideNav {
 }
 
 
-button.decide {
-  font-size: 4vh;
+button.clickable {
+  font-size: 3.6vh;
   border: none;
   padding: 15px;
   width: 75%;
-  margin-top: 50px;
+  margin-top: 20%;
   margin-bottom: 25px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+button.dark {
   font-family: "League Spartan";
   background-color: #101B29;
   color: white;
-  cursor: pointer;
+  border-radius: 7px;
+}
+
+button.light {
+  font-family: "League Spartan";
+  background-color: #FFD48E;
+  border-radius: 7px;
 }
 
 div.topNav {
@@ -140,47 +169,21 @@ div.circle {
   background-color: white;
 }
 
-div.favourites {
-  flex-grow: 3;
-  margin-left: 2%;
-  min-width: 25%;
-  height: 30%;
-  padding: 20px;
-  border-radius: 7px;
-  font-size: 4vh;
-  text-align: left;
-  background-image: url("https://media.discordapp.net/attachments/900291375801720837/1110619823332929546/IMG_7166.png?width=1027&height=730");
-  background-position: center;
-  background-size: cover;
-  background-color: #224B4C;
-  color: white;
-  cursor: pointer;
-}
-
-div.history {
-  flex-grow: 3;
-  margin-left: 2%;
-  margin-right: 2%;
-  min-width: 25%;
-  height: 30%;
-  padding: 20px;
-  border-radius: 7px;
-  font-size: 4vh;
-  text-align: left;
-  background-color: #224B4C;
-  background-image: url("https://media.discordapp.net/attachments/900291375801720837/1110619823630721135/IMG_7165.png?width=1027&height=730");
-  background-position: center;
-  background-size: cover;
-  color: white;
-  cursor: pointer;
-}
-
 .links {
   color: #ffd28e;
   cursor: pointer;
   text-decoration: underline;
 }
 
+.overflowScroll {
+  overflow: auto;
+  max-height: 50%;
+}
+
+.centerAlign {
+  justify-content: center;
+  align-items: center;
+}
 
 
 

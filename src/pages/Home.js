@@ -8,7 +8,7 @@ import TopNav from "../components/TopNav";
 export default function Home() {
     return (
           <main>
-            <div className='container'>
+            <div className='container-row'>
               <SideNav />
               <Favourites />
               <History />

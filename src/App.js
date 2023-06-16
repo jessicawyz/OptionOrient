@@ -5,7 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { ProfilePictureProvider } from './context/ProfilePictureContext'; 
 import './firebase'; // Import the Firebase initialization code
 
-import './App.css';
+import './css/App.css';
 import Signin from './components/Signin';
 import Signup from './components/Signup';
 import PasswordReset from './components/PasswordReset';
