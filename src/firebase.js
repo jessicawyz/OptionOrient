@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 /*import { initializeApp } from "firebase/app";*/
-import { getAuth } from "firebase/auth";
+import { useEffect, useState } from "react";
+import { getAuth, onAuthStateChanged, updateProfile } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import firebase from 'firebase/compat/app';
@@ -8,6 +9,7 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import 'firebase/compat/storage';
 import 'firebase/compat/app';
+
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -36,5 +38,18 @@ export const firestore = getFirestore(app);
 export const storage = getStorage(app);
 export { app }; 
 export default app;
+
+//hooks 
+export function useAuth() {
+    const [currUser, setCurrUser] = useState();
+
+    useEffect(() => {
+        const unsub = onAuthStateChanged(auth, user => setCurrUser(user));
+        return unsub;
+    }, [])
+
+    return currUser;
+}
+
 
 

@@ -22,9 +22,10 @@ const Signin = () => {
   };
 
   return (
-    <div className='max-w-[700px] tw-mx-auto tw-my-16 tw-p-4'>
+    <div className='tw-flex tw-justify-center'>
+    <div className='tw-basis-3/4 tw-m-5'>
       <div>
-        <h1 className='tw-text-2xl tw-font-bold tw-py-2'>Sign in to your account</h1>
+        <h1 className='tw-text-2xl tw-font-bold tw-py-2 tw-text-white'>Sign in to your account</h1>
 
         <p className='tw-py-3'>
           Don't have an account yet?{' '}
@@ -53,6 +54,7 @@ const Signin = () => {
             Reset Password.
           </Link>
         </p>
+    </div>
     </div>
   );
 };

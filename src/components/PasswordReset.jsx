@@ -23,8 +23,9 @@ const PasswordReset = () => {
   };
 
   return (
-    <div>
-      <h1 className='tw-text-2xl tw-font-bold tw-py-2'>Enter your email to receive a password reset email.</h1>
+    <div className='tw-flex tw-justify-center'>
+    <div className='tw-basis-3/4 tw-m-5'>
+      <h1 className='tw-text-2xl tw-font-bold tw-py-2 tw-text-white'>Enter your email to receive a password reset email.</h1>
       {isResetSent ? (
         <p>Password reset email sent. Please check your inbox.</p>
       ) : (
@@ -46,7 +47,7 @@ const PasswordReset = () => {
       )}
       {error && <p>{error}</p>}
 
-      <h1 className='tw-text-2xl tw-font-bold tw-py-2'>Now you can Sign in to your account</h1>
+      <h1 className='tw-text-2xl tw-font-bold tw-py-2 tw-text-white'>Now you can Sign in to your account</h1>
 
       <p className='tw-py-3'>
         Sign in here with your new password{' '}
@@ -54,6 +55,7 @@ const PasswordReset = () => {
           Sign in.
         </Link>
       </p>
+    </div>
     </div>
   );
 };
