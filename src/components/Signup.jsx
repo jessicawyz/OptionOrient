@@ -25,8 +25,13 @@ const Signup = () => {
       navigate('/home');
       console.log('success!');
     } catch (e) {
-      setError(e.message);
-      console.log(e.message);
+      if (e.message === 'Error creating user: Firebase: Error (auth/email-already-in-use).') {
+        setError('Email address is already in use');
+      } else {
+        console.log(e.code);
+        setError(e.message);
+      }
+      console.log(e);
     }
   };
 
@@ -42,6 +47,7 @@ const Signup = () => {
           </Link>
         </p>
       </div>
+
       <form onSubmit={handleSubmit}>
         <div className='tw-flex tw-flex-col tw-py-2'>
           <label className='tw-py-2 tw-font-medium tw-text-white'>Email Address</label>
@@ -51,6 +57,9 @@ const Signup = () => {
             type='email'
           />
         </div>
+
+        {error && error === 'Email address is already in use' && <p className='tw-text-red-500'>{error}</p>}
+
         <div className='tw-flex tw-flex-col tw-py-2 '>
           <label className='tw-py-2 tw-font-medium tw-text-white'>Password</label>
           <input
@@ -60,7 +69,7 @@ const Signup = () => {
           />
         </div>
 
-        {error && <p className='tw-text-red-500'>{error}</p>}
+        {error && error === 'Email address is already in use' && <p className='tw-text-red-500'>{error}</p>}
 
         <div className='tw-flex tw-flex-col tw-py-2'>
           <label className='tw-py-2 tw-font-medium tw-text-white'>Username</label>
