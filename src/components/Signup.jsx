@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -22,7 +21,7 @@ const Signup = () => {
 
     try {
       // Create the user account
-      createUser(email, password, username);
+      await createUser(email, password, username);
       navigate('/home');
       console.log('success!');
     } catch (e) {

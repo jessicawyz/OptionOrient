@@ -5,7 +5,6 @@ import { storage, useAuth } from "../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { updateProfile, getAuth } from "firebase/auth";
 import Avatar from "@mui/material/Avatar";
-import { upload } from '@testing-library/user-event/dist/upload';
 
 const Profile = () => {
   const { user, logout } = UserAuth();
@@ -74,7 +73,7 @@ const Profile = () => {
                 <div>
                   <Avatar alt="Profile" sx={{ width: 100, height: 100 }} src={photoURL} className="tw-my-8"/>
                   {/* Profile picture upload button */}
-                  <input type="file" onChange={handleProfilePictureUpload} />
+                  <input type="file" accept="image/*" onChange={handleProfilePictureUpload} />
                 </div>
     
                 <div>

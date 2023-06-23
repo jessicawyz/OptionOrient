@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SideNav from '../components/SideNav';
 import '../css/Decide.css';
 import '../css/App.css';
 import TopNav from '../components/TopNav';
+import { firestore, useAuth } from '../firebase';
+import { doc, setDoc } from 'firebase/firestore';
+import { useLocation } from 'react-router-dom';
+import { UserAuth } from '../context/AuthContext';
 
 const Decide = () => {
+  const user = UserAuth();
   const [options, setOptions] = useState([]);
   const [result, setResult] = useState('');
   const [optionInput, setOptionInput] = useState('');
@@ -14,7 +19,24 @@ const Decide = () => {
   const [showDecisionNameInput, setShowDecisionNameInput] = useState(false);
   const [currentDecision, setCurrentDecision] = useState(null);
   const [weights, setWeights] = useState([]);
-  const [decisionAdded, setDecisionAdded] = useState(false);
+
+  const location = useLocation();
+  const data = location.state;
+
+  useEffect(() => {
+    try {
+      if (data) {
+        setDecisionName(data.name);
+        setOptions(data.options);
+        setWeights(data.weights);
+      }
+    } catch(e) {
+      console.log('Error retrieving history' + e.message);
+      alert("error retrieving history");
+    }
+  }, [user]);
+
+  const currUser = useAuth();
 
   const handleOptionInput = (event) => {
     setOptionInput(event.target.value);
@@ -24,7 +46,7 @@ const Decide = () => {
   //since they get customized later on in the display part anyway but just in case
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (!decisionAdded) {
+    if (!decisionName) {
       setErrorMessage('Please add a decision name first');
       return;
     }
@@ -65,9 +87,20 @@ const Decide = () => {
       }
     }
 
+    //store to database 
+    storeHistory();
+    
     setResult(chosenOption);
     setShowModal(true);
   };
+
+  async function storeHistory() {
+    const dbRef = await doc(firestore,`${currUser.uid}`, `decision`, `history`, `${decisionName}`);
+    await setDoc(dbRef, {
+      options: options,
+      weights: weights,
+    });
+  }
 
   const closeModal = () => {
     setShowModal(false);
@@ -95,10 +128,6 @@ const Decide = () => {
     };
     setCurrentDecision(decision);
     setShowDecisionNameInput(false);
-    setOptions([]);
-    setWeights([]);
-    setDecisionName('');
-    setDecisionAdded(true);
   };
 
 
@@ -111,7 +140,7 @@ const Decide = () => {
     setCurrentDecision(null);
     setOptions([]);
     setWeights([]);
-    setDecisionAdded(false);
+    setDecisionName(null);
   };
 
   const deleteOption = (option) => {
@@ -135,8 +164,6 @@ const Decide = () => {
   const addNewDecision = () => {
     setShowDecisionNameInput(true);
     setCurrentDecision(null);
-    setOptions([]);
-    setWeights([]);
   };
 
   return (
@@ -196,7 +223,7 @@ const Decide = () => {
       </div>
         
       <div className="container-col centerButton section">
-      <h2 className='tw-text-xl tw-py-2 tw-font-bold tw-text-white'>Decision Name: {currentDecision?.name}</h2>
+      <h2 className='tw-text-xl tw-py-2 tw-font-bold tw-text-white'>Decision Name: {decisionName}</h2>
       <button className='light tw-py-2 tw-w-40 tw-my-5 tw-px-4 tw-text-black' onClick={addNewDecision}>
           Add Decision Name
         </button>
@@ -233,7 +260,7 @@ const Decide = () => {
               className='tw-border tw-p-3'
               type='text'
             />
-            {errorMessage && decisionName.trim() === '' && <p className='tw-text-red-500'>You need to enter a decision name</p>}
+            {errorMessage && (!decisionName || decisionName.trim() === '') && <p className='tw-text-red-500'>You need to enter a decision name</p>}
             <button className='tw-mt-4 tw-py-2 tw-px-4 tw-bg-blue-500 tw-text-white' onClick={handleConfirmDecisionName}>
               Confirm
             </button>
