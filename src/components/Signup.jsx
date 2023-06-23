@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 
 const Signup = () => {
   const [email, setEmail] = useState('');
@@ -22,19 +21,25 @@ const Signup = () => {
 
     try {
       // Create the user account
-      createUser(email, password, username);
+      await createUser(email, password, username);
       navigate('/home');
       console.log('success!');
     } catch (e) {
-      setError(e.message);
-      console.log(e.message);
+      if (e.message === 'Error creating user: Firebase: Error (auth/email-already-in-use).') {
+        setError('Email address is already in use');
+      } else {
+        console.log(e.code);
+        setError(e.message);
+      }
+      console.log(e);
     }
   };
 
   return (
-    <div className='max-w-[700px] tw-mx-auto tw-my-16 tw-p-4'>
+    <div className='tw-flex tw-justify-center'>
+    <div className='tw-basis-3/4 tw-m-5'>
       <div>
-        <h1 className='tw-text-2xl tw-font-bold tw-py-2'>Make your decision today! Sign up for an account</h1>
+        <h1 className='tw-text-2xl tw-font-bold tw-py-2 tw-text-white'>Make your decision today! Sign up for an account</h1>
         <p className='tw-py-2'>
           Already have an account?{' '}
           <Link to='/' className='links'>
@@ -42,6 +47,7 @@ const Signup = () => {
           </Link>
         </p>
       </div>
+
       <form onSubmit={handleSubmit}>
         <div className='tw-flex tw-flex-col tw-py-2'>
           <label className='tw-py-2 tw-font-medium tw-text-white'>Email Address</label>
@@ -51,6 +57,9 @@ const Signup = () => {
             type='email'
           />
         </div>
+
+        {error && error === 'Email address is already in use' && <p className='tw-text-red-500'>{error}</p>}
+
         <div className='tw-flex tw-flex-col tw-py-2 '>
           <label className='tw-py-2 tw-font-medium tw-text-white'>Password</label>
           <input
@@ -60,7 +69,7 @@ const Signup = () => {
           />
         </div>
 
-        {error && <p className='tw-text-red-500'>{error}</p>}
+        {error && error === 'Email address is already in use' && <p className='tw-text-red-500'>{error}</p>}
 
         <div className='tw-flex tw-flex-col tw-py-2'>
           <label className='tw-py-2 tw-font-medium tw-text-white'>Username</label>
@@ -75,6 +84,7 @@ const Signup = () => {
           Sign Up
         </button>
       </form>
+    </div>
     </div>
   );
 };

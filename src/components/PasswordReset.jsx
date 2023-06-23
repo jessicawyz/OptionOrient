@@ -17,8 +17,13 @@ const PasswordReset = () => {
       setIsResetSent(true);
       setError('');
     } catch (error) {
-      setIsResetSent(false);
-      setError(error.message);
+      if (error.message === "Firebase: No Firebase App '[DEFAULT]' has been created - call Firebase App.initializeApp() (app-compat/no-app)." ) {
+        setIsResetSent(false);
+        setError('Please enter you email address.');
+      } else {
+        setIsResetSent(false);
+        setError(error.message);
+      }
     }
   };
 
@@ -44,7 +49,7 @@ const PasswordReset = () => {
           </button>
         </form>
       )}
-      {error && <p>{error}</p>}
+      {error && <p className='tw-text-red-500'>{error}</p>}
 
       <h1 className='tw-text-2xl tw-font-bold tw-py-2'>Now you can Sign in to your account</h1>
 

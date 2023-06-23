@@ -16,8 +16,16 @@ const Signin = () => {
       await signIn(email, password)
       navigate('/home')
     } catch (e) {
+      if (e.message === 'Firebase: Error (auth/user-not-found).') {
+        setError('You have not signed up yet!');
+      } else if (e.message === 'Firebase: Error (auth/wrong-password).') {
+        setError('You have entered a wrong password!');
+      } else if (e.message === 'Firebase: Error (auth/missing-password).') {
+        setError('Please enter a password!');
+      } else {
       setError(e.message)
       console.log(e.message)
+      }
     }
   };
 
@@ -34,6 +42,7 @@ const Signin = () => {
         </p>
 
       </div>
+      {error && <p className='tw-text-red-500'>{error}</p>}
       <form onSubmit={handleSubmit}>
         <div className='tw-flex tw-flex-col tw-py-2'>
           <label className='tw-py-2 tw-font-medium tw-text-white'>Email Address</label>
