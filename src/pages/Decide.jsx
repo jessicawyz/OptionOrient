@@ -75,7 +75,36 @@ const Decide = () => {
     });
 
     const totalWeight = weightedOptions.reduce((sum, option) => sum + option.weight, 0);
+
+    //make sure no probability is left blank
+    if (weights.reduce((sum, weight) => sum + weight, 0) !== totalWeight) {
+      setErrorMessage('Please enter probabilities for all options');
+      return;
+    }
+
+    //test for total weight
+    if (weights.reduce((sum, weight) => sum + weight, 0) !== totalWeight) {
+      console.error('Assertion failed: Sum of weights does not match total weight');
+    }
+  
     const randomNum = Math.random() * totalWeight;
+
+    //test for randomNum
+    if (randomNum > totalWeight) {
+      console.error('Assertion failed: Random number is greater than the sum of weights');
+    }  
+
+    //test for non nengative weights(there should not be negative weights)
+    const hasNegativeWeights = weights.some((weight) => weight < 0);
+      if (hasNegativeWeights) {
+        console.error('Assertion failed: Weights must be non-negative');
+    }
+
+    //test for zero weights(there should not be any)
+    const hasZeroWeights = weights.some((weight) => weight === 0);
+      if (hasZeroWeights) {
+        console.error('Assertion failed: Weights must be non-zero');
+    }
 
     let weightSum = 0;
     let chosenOption = null;
@@ -156,8 +185,24 @@ const Decide = () => {
   };
 
   const handleWeightChange = (event, index) => {
+    const inputValue = event.target.value;
     const updatedWeights = [...weights];
-    updatedWeights[index] = parseInt(event.target.value);
+    if (inputValue === '') {
+      setErrorMessage('Probability cannot be blank');
+      updatedWeights[index] = 1;
+    }
+    const newWeight = parseInt(inputValue);
+    if (newWeight === 0) {
+      setErrorMessage('Probability cannot be 0');
+      return;
+    }
+    if (newWeight === 0) {
+      // Revert to 1 if nothing is entered or zero is entered
+      updatedWeights[index] = 1; 
+    } else {
+      updatedWeights[index] = newWeight;
+    }
+  
     setWeights(updatedWeights);
   };
 
