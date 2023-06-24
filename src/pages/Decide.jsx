@@ -94,6 +94,18 @@ const Decide = () => {
       console.error('Assertion failed: Random number is greater than the sum of weights');
     }  
 
+    //test for non nengative weights(there should not be negative weights)
+    const hasNegativeWeights = weights.some((weight) => weight < 0);
+      if (hasNegativeWeights) {
+        console.error('Assertion failed: Weights must be non-negative');
+    }
+
+    //test for zero weights(there should not be any)
+    const hasZeroWeights = weights.some((weight) => weight === 0);
+      if (hasZeroWeights) {
+        console.error('Assertion failed: Weights must be non-zero');
+    }
+
     let weightSum = 0;
     let chosenOption = null;
     for (const option of weightedOptions) {
