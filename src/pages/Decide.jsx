@@ -23,11 +23,13 @@ const Decide = () => {
   const location = useLocation();
   const data = location.state;
 
+
   useEffect(() => {
     try {
       if (data) {
         setDecisionName(data.name);
         setOptions(data.options);
+        console.log(options);
         setWeights(data.weights);
       }
     } catch(e) {
@@ -125,7 +127,16 @@ const Decide = () => {
 
   async function storeHistory() {
     const dbRef = await doc(firestore,`${currUser.uid}`, `decision`, `history`, `${decisionName}`);
+    const date = await new Date();
+
+    var day = await date.getDate();
+    var month = await date.getMonth() + 1;
+    var year = await date.getFullYear();
+    var time = await date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+    var currentDate = await `${year}-${month}-${day} ` + time;
+    
     await setDoc(dbRef, {
+      time: currentDate,
       options: options,
       weights: weights,
     });

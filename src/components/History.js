@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from 'react';
 import '../css/Home.css';
 import { firestore, useAuth } from '../firebase';
-import { getDocs, collection } from "firebase/firestore";
+import { getDocs, collection, orderBy, query, limit } from "firebase/firestore";
 import { UserAuth } from '../context/AuthContext';
 import { getAuth } from 'firebase/auth';
 import { Link } from 'react-router-dom';
@@ -16,26 +16,28 @@ export default function History() {
     const user = UserAuth();
 
     const ref = collection(firestore, `${getAuth().currentUser.uid}`, "decision", "history")
-    console.log(getAuth().currentUser.uid);
     
     useEffect(() => {
         async function getHistory() {
-            const docSnap = await getDocs(ref);
+            const q = await query(ref, orderBy("time", "desc"), limit(5));
+            const docSnap = await getDocs(q);
             docSnap.forEach((doc) => {
                 namesA.push(doc.id);
+                console.log(namesA);
                 optionsA.push(doc.data().options);
                 weightsA.push(doc.data().weights);
-
-                setNames(namesA);
-                setOptions(optionsA);
-                setWeights(weightsA);
+                
             });
+            
+            setNames(namesA);
+            setOptions(optionsA);
+            setWeights(weightsA);
+            
         }
         getHistory();
     }, [user]);
 
-
-    console.log("name array after loop " + names[0]);
+    
 
     return (
         <button className="history section">
