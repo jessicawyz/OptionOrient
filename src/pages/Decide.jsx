@@ -212,7 +212,7 @@ const Decide = () => {
                       onChange={(e) => handleWeightChange(e, index)}
                       className='nfText tw-basis-3/8 tw-mr-5 tw-text-white tw-bg-transparent tw-text-center'
                     />
-                    <button className='nfText tw-basis-auto' onClick={() => deleteOption(option)}>Delete</button>
+                    <button className='nfText tw-basis-auto' onClick={() => deleteOption(option)}>⊝</button>
                   </div>
               ))}
           </div>
