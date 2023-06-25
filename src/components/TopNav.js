@@ -38,7 +38,7 @@ export default function TopNav() {
         Logout
       </div>
       <div>
-        <Link to="/profile" className="links">
+        <Link to="/profile">
           Profile
         </Link>
       </div>
