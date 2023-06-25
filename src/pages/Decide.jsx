@@ -146,6 +146,12 @@ const Decide = () => {
     setShowModal(false);
   };
 
+  const handleCancel = () => {
+    setShowDecisionNameInput(false);
+    setDecisionName(null);
+  };
+  
+
   const clearAllOptions = () => {
     setOptions([]);
     setWeights([]);
@@ -198,11 +204,12 @@ const Decide = () => {
   const handleWeightChange = (event, index) => {
     const inputValue = event.target.value;
     const updatedWeights = [...weights];
+    const newWeight = parseInt(inputValue);
     if (inputValue === '') {
       setErrorMessage('Probability cannot be blank');
-      updatedWeights[index] = 1;
+      //updatedWeights[index] = 1;
     }
-    const newWeight = parseInt(inputValue);
+
     if (newWeight === 0) {
       setErrorMessage('Probability cannot be 0');
       return;
@@ -211,6 +218,7 @@ const Decide = () => {
       // Revert to 1 if nothing is entered or zero is entered
       updatedWeights[index] = 1; 
     } else {
+      setErrorMessage('');
       updatedWeights[index] = newWeight;
     }
   
@@ -245,7 +253,8 @@ const Decide = () => {
               </button>
             </div>
             <div>
-              {errorMessage && <p className='tw-text-red-500'>{errorMessage}</p>}</div>
+            {errorMessage && <p className='tw-text-red-500'>{errorMessage}</p>} 
+              </div>
             
           </form>
         </div>
@@ -271,6 +280,7 @@ const Decide = () => {
                     <button className='nfText tw-basis-auto' onClick={() => deleteOption(option)}>⊝</button>
                   </div>
               ))}
+            
           </div>
           <button onClick={clearAllOptions} className='dark clickable tw-self-center'>
             Clear All Choices
@@ -302,27 +312,33 @@ const Decide = () => {
             <button className='tw-mt-4 tw-py-2 tw-px-4 tw-bg-blue-500 tw-text-white' onClick={closeModal}>
               Close
             </button>
+          
           </div>
         </div>
       )}
 
-      {showDecisionNameInput && !currentDecision && (
-        <div className='tw-fixed tw-inset-0 tw-flex tw-items-center tw-justify-center tw-bg-gray-800 tw-bg-opacity-75'>
-          <div className='tw-bg-white tw-p-6 tw-rounded-lg'>
-            <h3 className='tw-text-lg tw-font-medium tw-mb-4'>Enter Decision Name</h3>
-            <input
-              value={decisionName}
-              onChange={handleDecisionNameInput}
-              className='tw-border tw-p-3'
-              type='text'
-            />
-            {errorMessage && (!decisionName || decisionName.trim() === '') && <p className='tw-text-red-500'>You need to enter a decision name</p>}
-            <button className='tw-mt-4 tw-py-2 tw-px-4 tw-bg-blue-500 tw-text-white' onClick={handleConfirmDecisionName}>
-              Confirm
-            </button>
-          </div>
-        </div>
+{showDecisionNameInput && (
+  <div className='tw-fixed tw-inset-0 tw-flex tw-items-center tw-justify-center tw-bg-gray-800 tw-bg-opacity-75'>
+    <div className='tw-bg-white tw-p-6 tw-rounded-lg'>
+      <h3 className='tw-text-lg tw-font-medium tw-mb-4'>Enter Decision Name</h3>
+      <input
+        value={decisionName}
+        onChange={handleDecisionNameInput}
+        className='tw-border tw-p-3'
+        type='text'
+      />
+      {errorMessage && (!decisionName || decisionName.trim() === '') && (
+        <p className='tw-text-red-500'>You need to enter a decision name</p>
       )}
+      <button className='tw-mt-4 tw-py-2 tw-px-4 tw-bg-blue-500 tw-text-white' onClick={handleConfirmDecisionName}>
+        Confirm
+      </button>
+      <button className='tw-mt-4 tw-py-2 tw-px-4 tw-bg-red-500 tw-text-white' onClick={handleCancel}>
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
     </div>
     </div>
   );
