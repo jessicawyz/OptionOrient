@@ -13,29 +13,38 @@ const UserContext = createContext();
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState({});
 
-  const createUser = (email, password, username) => {
-    return createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        // Update the user's display name with the provided username
-        return updateProfile(user, { displayName: username })
-          .then(() => user)
-          .catch((error) => {
-            throw new Error('Error updating user profile: ' + error.message);
-          });
-      })
-      .catch((error) => {
-        throw new Error('Error creating user: ' + error.message);
-      });
+  const createUser = async (email, password, username) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      // Update the user's display name with the provided username
+      await updateProfile(user, { displayName: username });
+      setUser(user);
+      return user;
+    } catch (error) {
+      throw new Error('Error creating user: ' + error.message);
+    }
   };
 
-  const signIn = (email, password) =>  {
-    return signInWithEmailAndPassword(auth, email, password)
-  }
+  const signIn = async (email, password) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      setUser(user);
+      return user;
+    } catch (error) {
+      throw new Error('Error signing in: ' + error.message);
+    }
+  };
 
-  const logout = () => {
-      return signOut(auth);
-  }
+  const logout = async () => {
+    try {
+      await signOut(auth);
+      setUser({});
+    } catch (error) {
+      throw new Error('Error logging out: ' + error.message);
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -48,8 +57,14 @@ export const AuthContextProvider = ({ children }) => {
   }, []);
 
   return (
-    <UserContext.Provider 
-        value={{ createUser, user, logout, signIn }}>
+    <UserContext.Provider
+      value={{
+        createUser,
+        signIn,
+        logout,
+        user,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
@@ -57,4 +72,4 @@ export const AuthContextProvider = ({ children }) => {
 
 export function UserAuth() {
   return useContext(UserContext);
-};
+}

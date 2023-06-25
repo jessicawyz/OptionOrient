@@ -46,12 +46,12 @@ const Signin = () => {
       {error && <p className='tw-text-red-500'>{error}</p>}
       <form onSubmit={handleSubmit}>
         <div className='tw-flex tw-flex-col tw-py-2'>
-          <label className='tw-py-2 tw-font-medium tw-text-white'>Email Address</label>
-          <input onChange={(e) => setEmail(e.target.value)} className='tw-border tw-p-3' type='email' />
+          <label htmlFor="emailInput" className='tw-py-2 tw-font-medium tw-text-white'>Email Address</label>
+          <input id="emailInput" onChange={(e) => setEmail(e.target.value)} className='tw-border tw-p-3' type='email' />
         </div>
         <div className='tw-flex tw-flex-col tw-py-2'>
-          <label className='tw-py-2 tw-font-medium tw-text-white'>Password</label>
-          <input onChange={(e) => setPassword(e.target.value)} className='tw-border tw-p-3' type='password' />
+          <label htmlFor="passwordInput" className='tw-py-2 tw-font-medium tw-text-white'>Password</label>
+          <input id="passwordInput" onChange={(e) => setPassword(e.target.value)} className='tw-border tw-p-3' type='password' />
         </div>
         <button className='tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-w-full tw-p-4 tw-my-2 tw-text-white'>
           Sign In
