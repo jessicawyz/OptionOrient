@@ -5,8 +5,8 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 
 
 const ProtectedRoute = ({ children }) => {
-    const [user] = useAuthState(auth);
-    if (!user) {
+    const [user, loading] = useAuthState(auth);
+    if (!loading && !user) {
         return <Navigate to='/' />;
     }
     return children;

@@ -30,7 +30,11 @@ export default function History() {
     const histRef = collection(firestore, `${uid}`, "decision", "history");
 
     useEffect(() => {
-        getHistory();
+        try {
+            getHistory();
+        } catch(e) {
+            console.log("Error getting history: " + e.message);
+        }
     }, [uid]);
 
     async function getHistory() {
@@ -62,9 +66,17 @@ export default function History() {
         var currentDate = `${year}-${month}-${day} ` + time;
 
         if (event.target.checked) {
-            storeFav(names[index], options[index], weights[index], currentDate);
+            try {
+                storeFav(names[index], options[index], weights[index], currentDate);
+            } catch(e) {
+                console.log("Error storing favorite: " + e.message);
+            }
         } else {
-            deleteFav(names[index]);
+            try {
+                deleteFav(names[index]);
+            } catch (e) {
+                console.log("Error removing favorite: " + e.message);
+            }
         }
     }
 

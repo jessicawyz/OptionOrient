@@ -33,8 +33,12 @@ const Decide = () => {
       if (data) {
         setDecisionName(data.name);
         setOptions(data.options);
-        console.log(options);
         setWeights(data.weights);
+        const decision = {
+          name: decisionName,
+          options: options,
+        };
+        setCurrentDecision(decision);
       }
     } catch(e) {
       console.log('Error retrieving history' + e.message);
@@ -145,20 +149,32 @@ const Decide = () => {
                     ("0" + date.getSeconds()).slice(-2);
     
     var currentDate = await `${year}-${month}-${day} ` + time;
-    const snapshot = await getDoc(dbRef);
-    if (snapshot.data().favorite) {
-      await updateDoc(dbRef, {
-        time: currentDate,
-        options: options,
-        weights: weights,
-      });
-    } else {
-      await setDoc(dbRef, {
-        time: currentDate,
-        options: options,
-        weights: weights,
-        favorite: false,
-      });
+    try {
+      const snapshot = await getDoc(dbRef);
+      if (snapshot.data() && snapshot.data().favorite) {
+        const favRef = await doc(firestore,`${currUser.uid}`, `decision`, `favourites`, `${decisionName}`);
+        await setDoc(dbRef, {
+          time: currentDate,
+          options: options,
+          weights: weights,
+          favorite: true,
+        });
+
+        await updateDoc(favRef, {
+          options: options, 
+          weights: weights,
+        })
+
+      } else {
+        await setDoc(dbRef, {
+          time: currentDate,
+          options: options,
+          weights: weights,
+          favorite: false,
+        });
+      }
+    } catch (e) {
+      console.log("Error setting history: " + e.message);
     }
   }
 
@@ -176,15 +192,22 @@ const Decide = () => {
     
     var currentDate = await `${year}-${month}-${day} ` + time;
 
-    await setDoc(favRef, {
-      time: currentDate,
-      options: options,
-      weights: weights,
-    });
+    try { 
+      await setDoc(favRef, {
+        time: currentDate,
+        options: options,
+        weights: weights,
+      });
 
-    await updateDoc(historyRef, {
-      favorite: true,
-    });
+      await setDoc(historyRef, {
+        favorite: true,
+        time: currentDate,
+        options: options,
+        weights: weights,
+      });
+    } catch (e) { 
+      console.log("Error storing favorites: " + e.message);
+    }
   }
 
   const closeModal = () => {
@@ -193,7 +216,6 @@ const Decide = () => {
 
   const handleCancel = () => {
     setShowDecisionNameInput(false);
-    setDecisionName(null);
   };
   
 
@@ -272,7 +294,6 @@ const Decide = () => {
 
   const addNewDecision = () => {
     setShowDecisionNameInput(true);
-    setCurrentDecision(null);
   };
 
   function addFavorite(event) {
