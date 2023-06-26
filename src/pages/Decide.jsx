@@ -253,7 +253,8 @@ const Decide = () => {
               </button>
             </div>
             <div>
-            {errorMessage && <p className='tw-text-red-500'>{errorMessage}</p>} 
+            {errorMessage && optionInput !== '' && <p className='tw-text-red-500'>{errorMessage}</p>} 
+            {errorMessage && optionInput === '' && <p className='tw-text-red-500'>{errorMessage}</p>} 
               </div>
             
           </form>
