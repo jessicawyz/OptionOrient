@@ -16,11 +16,11 @@ const Signin = () => {
       await signIn(email, password)
       navigate('/home')
     } catch (e) {
-      if (e.message === 'Firebase: Error (auth/user-not-found).') {
+      if (e.message === 'Error signing in: Firebase: Error (auth/user-not-found).') {
         setError('You have not signed up yet!');
-      } else if (e.message === 'Firebase: Error (auth/wrong-password).') {
+      } else if (e.message === 'Error signing in: Firebase: Error (auth/wrong-password).') {
         setError('You have entered a wrong password!');
-      } else if (e.message === 'Firebase: Error (auth/missing-password).') {
+      } else if (e.message === 'Error signing in: Firebase: Error (auth/missing-password).') {
         setError('Please enter a password!');
       } else {
       setError(e.message)

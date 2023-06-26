@@ -4,9 +4,12 @@ import '../css/Decide.css';
 import '../css/App.css';
 import TopNav from '../components/TopNav';
 import { firestore, useAuth } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, updateDoc, getDoc } from 'firebase/firestore';
 import { useLocation } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
+import Checkbox from '@mui/material/Checkbox';
+
+
 
 const Decide = () => {
   const user = UserAuth();
@@ -19,6 +22,7 @@ const Decide = () => {
   const [showDecisionNameInput, setShowDecisionNameInput] = useState(false);
   const [currentDecision, setCurrentDecision] = useState(null);
   const [weights, setWeights] = useState([]);
+  var addFav = false;
 
   const location = useLocation();
   const data = location.state;
@@ -120,6 +124,10 @@ const Decide = () => {
 
     //store to database 
     storeHistory();
+
+    if(addFav) {
+      storeFav();
+    }
     
     setResult(chosenOption);
     setShowModal(true);
@@ -129,16 +137,53 @@ const Decide = () => {
     const dbRef = await doc(firestore,`${currUser.uid}`, `decision`, `history`, `${decisionName}`);
     const date = await new Date();
 
-    var day = await date.getDate();
-    var month = await date.getMonth() + 1;
+    var day = await ("0" + date.getDate()).slice(-2);
+    var month = await ("0" + (date.getMonth() + 1)).slice(-2);
     var year = await date.getFullYear();
-    var time = await date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-    var currentDate = await `${year}-${month}-${day} ` + time;
+    var time = await ("0" + date.getHours()).slice(-2) + ":" + 
+                    ("0" + date.getMinutes()).slice(-2) + ":" + 
+                    ("0" + date.getSeconds()).slice(-2);
     
-    await setDoc(dbRef, {
+    var currentDate = await `${year}-${month}-${day} ` + time;
+    const snapshot = await getDoc(dbRef);
+    if (snapshot.data().favorite) {
+      await updateDoc(dbRef, {
+        time: currentDate,
+        options: options,
+        weights: weights,
+      });
+    } else {
+      await setDoc(dbRef, {
+        time: currentDate,
+        options: options,
+        weights: weights,
+        favorite: false,
+      });
+    }
+  }
+
+  async function storeFav() {
+    const historyRef = await doc(firestore,`${currUser.uid}`, `decision`, `history`, `${decisionName}`);
+    const favRef = await doc(firestore,`${currUser.uid}`, `decision`, `favourites`, `${decisionName}`);
+    const date = await new Date();
+
+    var day = await ("0" + date.getDate()).slice(-2);
+    var month = await ("0" + (date.getMonth() + 1)).slice(-2);
+    var year = await date.getFullYear();
+    var time = await ("0" + date.getHours()).slice(-2) + ":" + 
+                    ("0" + date.getMinutes()).slice(-2) + ":" + 
+                    ("0" + date.getSeconds()).slice(-2);
+    
+    var currentDate = await `${year}-${month}-${day} ` + time;
+
+    await setDoc(favRef, {
       time: currentDate,
       options: options,
       weights: weights,
+    });
+
+    await updateDoc(historyRef, {
+      favorite: true,
     });
   }
 
@@ -230,6 +275,14 @@ const Decide = () => {
     setCurrentDecision(null);
   };
 
+  function addFavorite(event) {
+    if (event.target.checked) {
+      addFav = true;
+    } else {
+      addFav = false;
+    }
+  }
+
   return (
     <div>
     <TopNav />
@@ -296,13 +349,14 @@ const Decide = () => {
         </button>
         {currentDecision && (
           <button className='dark tw-py-2 tw-w-40 tw-px-4 tw-bg-red-500 tw-text-white' onClick={deleteDecision}>
-            Delete Decision
+            Clear Decision
           </button>
         )}
 
         <button onClick={generateRandomResult} className='clickable generate'>
           Make the decision!
         </button>
+        <div className='tw-text-white'> <Checkbox className='tw-text-white' onChange={(event) => addFavorite(event)} /> Add to Favorites</div>
       </div>
 
       {showModal && (

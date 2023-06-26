@@ -71,7 +71,7 @@ const Signup = () => {
             />
           </div>
 
-          {error && error === 'Email address is already in use' && <p className="tw-text-red-500">{error}</p>}
+          {error && error !== 'Email address is already in use' && <p className="tw-text-red-500">{error}</p>}
 
           <div className="tw-flex tw-flex-col tw-py-2">
             <label htmlFor="usernameInput" className="tw-py-2 tw-font-medium tw-text-white">Username</label>
