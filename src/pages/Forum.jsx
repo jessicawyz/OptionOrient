@@ -24,12 +24,14 @@ function Forum() {
   useEffect(() => {
     const fetchPosts = async () => {
       const postsCollection = collection(firestore, 'posts');
-
+    
       const unsubscribe = onSnapshot(postsCollection, (snapshot) => {
-        const postsData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const postsData = snapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => b.createdAt - a.createdAt); // Sort posts by creating timestamp in descending order :/
         setPosts(postsData);
       });
-
+    
       return unsubscribe;
     };
 
@@ -40,16 +42,22 @@ function Forum() {
     e.preventDefault();
     if (newPostContent) {
       const postsCollection = collection(firestore, 'posts');
-
+  
       await addDoc(postsCollection, {
         content: newPostContent,
         comments: [],
         likes: 0,
+        userId: user.uid,
+        likedby: [],
+        createdAt: new Date(), // to sort the posts with creation time
       });
-
+  
       setNewPostContent('');
     }
   };
+  
+
+  //forum only handles creating posts, plus all the functions that we need to navigate to other pages
 
   return (
     <div className="tw-text-white">
