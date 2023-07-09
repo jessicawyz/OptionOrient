@@ -6,7 +6,8 @@ import {
   onAuthStateChanged,
   updateProfile
 } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, firestore } from '../firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 const UserContext = createContext();
 
@@ -19,6 +20,14 @@ export const AuthContextProvider = ({ children }) => {
       const user = userCredential.user;
       // Update the user's display name with the provided username
       await updateProfile(user, { displayName: username });
+      const dbRef = doc(firestore,`${user.uid}`, `info`);
+      
+      await setDoc(dbRef, {
+        username: username,
+        email: email,
+        photoURL: null,
+      })
+
       setUser(user);
       return user;
     } catch (error) {

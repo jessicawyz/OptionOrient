@@ -152,7 +152,7 @@ const Decide = () => {
     try {
       const snapshot = await getDoc(dbRef);
       if (snapshot.data() && snapshot.data().favorite) {
-        const favRef = await doc(firestore,`${currUser.uid}`, `decision`, `favourites`, `${decisionName}`);
+        const favRef = doc(firestore,`${currUser.uid}`, `decision`, `favourites`, `${decisionName}`);
         await setDoc(dbRef, {
           time: currentDate,
           options: options,

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { UserAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { storage, useAuth } from "../firebase";
+import { storage, useAuth, firestore } from "../firebase";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { doc, updateDoc } from 'firebase/firestore';
 import { updateProfile, getAuth } from "firebase/auth";
 import Avatar from "@mui/material/Avatar";
 
@@ -52,9 +53,17 @@ const Profile = () => {
       const snapshot = await uploadBytes(imageRef, file);
       const photoURL = await getDownloadURL(imageRef);
 
-      updateProfile(currUser, {photoURL});
-      alert("uploaded image!");
-      window.location.reload(true);
+      try {
+        updateProfile(currUser, {photoURL});
+        const dbRef = doc(firestore,`${user.uid}`, `info`);
+        await updateDoc(dbRef, {
+          photoURL: photoURL,
+        })
+        alert("uploaded image!");
+        window.location.reload(true);
+      } catch (e) {
+        console.log("Error uploading profile picture: " + e.message);
+      }
     }
 
       useEffect(() => {
