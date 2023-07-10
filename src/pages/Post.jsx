@@ -7,7 +7,6 @@ import { UserAuth } from '../context/AuthContext';
 
 function Post({ post }) {
   const [newCommentContent, setNewCommentContent] = useState('');
-  const [liked, setLiked] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(post.content);
   const { user } = UserAuth();
@@ -29,7 +28,6 @@ function Post({ post }) {
         likedBy: updatedLikedBy,
         likes: increment(-1),
       });
-      setLiked(false);
     } else {
       // User hasn't liked the post, so like it
       let updatedLikedBy = [];
@@ -44,7 +42,6 @@ function Post({ post }) {
         likedBy: updatedLikedBy,
         likes: increment(1),
       });
-      setLiked(true);
     }
   };
 
@@ -123,12 +120,16 @@ function Post({ post }) {
         </div>
       )}
       <button
-        className="tw-mt-2 tw-flex tw-items-center tw-text-red-500"
-        onClick={handleLikePost}
-      >
-        {liked ? <FaHeart size={20} /> : <FaRegHeart size={20} />}
-        <span className="tw-ml-2">{post.likes}</span>
-      </button>
+  className="tw-mt-2 tw-flex tw-items-center tw-text-red-500 relative"
+  onClick={handleLikePost}
+>
+  {post.likedBy && post.likedBy.includes(user.uid) ? (
+    <FaHeart size={20} />
+  ) : (
+    <FaRegHeart size={20} />
+  )}
+  <span className="tw-ml-2">{post.likes}</span>
+</button>
       <form onSubmit={handleCreateComment}>
         <textarea
         className="tw-text-black"

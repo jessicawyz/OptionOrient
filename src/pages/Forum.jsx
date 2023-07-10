@@ -28,7 +28,8 @@ function Forum() {
       const unsubscribe = onSnapshot(postsCollection, (snapshot) => {
         const postsData = snapshot.docs
           .map((doc) => ({ id: doc.id, ...doc.data() }))
-          .sort((a, b) => b.createdAt - a.createdAt); // Sort posts by creating timestamp in descending order :/
+          // Sort posts by creating timestamp in descending order, newer posts should appear on top
+          .sort((a, b) => b.createdAt - a.createdAt); 
         setPosts(postsData);
       });
     
@@ -46,9 +47,9 @@ function Forum() {
       await addDoc(postsCollection, {
         content: newPostContent,
         comments: [],
+        likedBy: [],
         likes: 0,
         userId: user.uid,
-        likedby: [],
         createdAt: new Date(), // to sort the posts with creation time
       });
   
