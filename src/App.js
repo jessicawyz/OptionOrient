@@ -16,6 +16,7 @@ import Home from './pages/Home';
 import Decide from './pages/Decide';
 import Forum from './pages/Forum';
 import MyPosts from './pages/MyPosts';
+import SortLikes from './pages/SortLikes';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -70,6 +71,16 @@ function App() {
               element={
                 <ProtectedRoute>
                   <MyPosts />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Sort Likes page */}
+            <Route
+              path="/sort-likes"
+              element={
+                <ProtectedRoute>
+                  <SortLikes />
                 </ProtectedRoute>
               }
             />
