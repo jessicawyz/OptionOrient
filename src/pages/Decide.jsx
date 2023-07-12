@@ -138,7 +138,7 @@ const Decide = () => {
   };
 
   async function storeHistory() {
-    const dbRef = await doc(firestore,`${currUser.uid}`, `decision`, `history`, `${decisionName}`);
+    const dbRef = await doc(firestore,`${currUser.displayName}`, `decision`, `history`, `${decisionName}`);
     const date = await new Date();
 
     var day = await ("0" + date.getDate()).slice(-2);
@@ -152,7 +152,7 @@ const Decide = () => {
     try {
       const snapshot = await getDoc(dbRef);
       if (snapshot.data() && snapshot.data().favorite) {
-        const favRef = doc(firestore,`${currUser.uid}`, `decision`, `favourites`, `${decisionName}`);
+        const favRef = doc(firestore,`${currUser.displayName}`, `decision`, `favourites`, `${decisionName}`);
         await setDoc(dbRef, {
           time: currentDate,
           options: options,
@@ -179,8 +179,8 @@ const Decide = () => {
   }
 
   async function storeFav() {
-    const historyRef = await doc(firestore,`${currUser.uid}`, `decision`, `history`, `${decisionName}`);
-    const favRef = await doc(firestore,`${currUser.uid}`, `decision`, `favourites`, `${decisionName}`);
+    const historyRef = await doc(firestore,`${currUser.displayName}`, `decision`, `history`, `${decisionName}`);
+    const favRef = await doc(firestore,`${currUser.displayName}`, `decision`, `favourites`, `${decisionName}`);
     const date = await new Date();
 
     var day = await ("0" + date.getDate()).slice(-2);

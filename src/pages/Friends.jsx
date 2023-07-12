@@ -5,46 +5,58 @@ import TopNav from "../components/TopNav";
 import FriendList from '../components/FriendList';
 import { firestore, auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { doc, getDoc, setDoc, collection, addDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, getDocs, orderBy } from 'firebase/firestore';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import Avatar from "@mui/material/Avatar";
+import Badge from '@mui/material/Badge';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 export default function Friends() {
     const [user, loading] = useAuthState(auth);
+    const [requests, setRequests] = useState([]);
     const [openSearch, setOpenSearch] = useState(false);
     const [displayProfile, setDisplayProfile] = useState(false);
-    const [id, setId] = useState(null);
+    const [friend, setFriend] = useState("");
     const [error, setError] = useState("");
     const [friendInfo, setFriendInfo] = useState(null);
+    const [openReqList, setOpenReqList] = useState(false);
 
-    const [uid, setUid] = useState(null);
+    const [username, setUsername] = useState(null);
     useEffect(() => {
         if (user) {
-            setUid(user.uid)
+            setUsername(user.displayName)
         }
     }, [user]);
 
+    useEffect(() => {
+        try {
+            getReq();
+        } catch(e) {
+            console.log("Error getting requests: " + e.message);
+        }
+    }, [username]);
+
     function handleGetID() {
         try {
-            navigator.clipboard.writeText(uid);
-            alert("Successfully copied UID!");
+            navigator.clipboard.writeText(username);
+            alert("Successfully copied username!");
         } catch(e) {
-            console.log("Error copying UID: " + e.message);
+            console.log("Error copying username: " + e.message);
         }
     }
     async function searchId() {
         setError("");
-        if (!id) {
-            setError("Please enter an id");
+        if (!friend) {
+            setError("Please enter a username");
             return;
         }
-        if (id === uid) {
+        if (friend === username) {
             setError("You cannot add yourself as a friend!");
             return;
         }
-        const dbRef = doc(firestore, `${id}`, "info");
+        const dbRef = doc(firestore, `${friend}`, "info");
         const snapShot = await getDoc(dbRef);
-        const friendRef = doc(firestore, `${uid}`, "info", "friends", `${id}`);
+        const friendRef = doc(firestore, `${username}`, "info", "friends", `${friend}`);
         const friendSnap = await getDoc(friendRef);
 
         if (friendSnap.exists()) {
@@ -58,7 +70,7 @@ export default function Friends() {
         } else {
             console.log(true);
             try {
-                const friendRef = doc(firestore, `${id}`, `info`);
+                const friendRef = doc(firestore, `${friend}`, `info`);
                 const snapshot = await getDoc(friendRef);
                 setFriendInfo(snapshot.data());
                 console.log(friendInfo);
@@ -74,13 +86,22 @@ export default function Friends() {
     const handleClickAway = () => {
         setError("");
         setOpenSearch(false);
-        setId("");
+        setFriend("");
         setDisplayProfile(false);
         setFriendInfo(null);
+        setOpenReqList(false);
     }
 
+    /*
+    await setDoc(friendRef, {
+                uid: friendInfo.uid,
+                email: friendInfo.email,
+                photoURL: friendInfo.photoURL,
+                username: friendInfo.username,
+                time: currentDate,
+            });*/
     async function handleConfirm() {
-        const addRef = doc(firestore, `${uid}`, `info`, `friends`, `${id}`);
+        const friendRef = doc(firestore, `${friend}`, 'info', 'requests', `${username}`);
 
         const date = await new Date();
 
@@ -93,19 +114,33 @@ export default function Friends() {
         
         var currentDate = await `${year}-${month}-${day} ` + time;
         try {
-            await setDoc(addRef, {
-                email: friendInfo.email,
-                photoURL: friendInfo.photoURL,
-                username: friendInfo.username,
-                time: currentDate,
-            });
 
-            alert("Friend added successfully!");
+            await setDoc(friendRef, {
+                uid: user.uid, 
+                email: user.email,
+                photoURL: user.photoURL,
+                username: user.displayName,
+                time: currentDate,
+            })
+
+            alert("Friend request sent");
             setDisplayProfile(false);
-            setId("");
+            setFriend("");
         } catch(e) {
-            console.log("Error adding friend: " + e.message);
+            console.log("Error sending friend request: " + e.message);
         }
+    }
+
+    async function getReq() {
+        const reqRef = collection(firestore, `${username}`, "info", "requests");
+        const q = query(reqRef, orderBy("time", "desc"));
+        let reqArray = [];
+        const docSnap = await getDocs(q);
+        await docSnap.forEach((doc) => {
+            reqArray.push(doc.data());
+        });
+
+        await setRequests(reqArray);
     }
 
     
@@ -116,8 +151,12 @@ export default function Friends() {
               <div className='tw-flex-grow tw-mx-4 tw-flex tw-flex-col'>
                 <div className='tw-flex tw-flex-row'>
                     <p className='tw-font-medium tw-text-3xl tw-text-white'>Friends</p>
-                    <button className="tw-ml-4 tw-p-2 light" onClick={handleGetID}>Copy ID</button>
+                    <button className="tw-ml-4 tw-p-2 light" onClick={handleGetID}>Copy Username</button>
                     <button className="tw-ml-4 tw-p-2 light" onClick={() => setOpenSearch(true)}>Add a Friend</button>
+                    <Badge badgeContent={requests.length} color='primary' className="tw-mt-2 tw-mx-4" onClick={() => setOpenReqList(true)}>
+                        <NotificationsIcon fontSize='medium' className='tw-text-white'></NotificationsIcon>
+                    </Badge>
+                    
                 </div>
                 <div className="tw-overflow-x-hidden tw-overflow-y-scroll">
                     <FriendList />
@@ -129,10 +168,10 @@ export default function Friends() {
             <div className='tw-fixed tw-inset-0 tw-flex tw-items-center tw-justify-center tw-bg-gray-800 tw-bg-opacity-75'>
                 <ClickAwayListener onClickAway={handleClickAway}>
                     <div className='tw-bg-white tw-p-6 tw-rounded-lg'>
-                        <h3 className='tw-text-lg tw-font-medium tw-mb-4'>Enter Friend ID</h3>
+                        <h3 className='tw-text-lg tw-font-medium tw-mb-4'>Enter Friend Username</h3>
                         <input
-                            value={id}
-                            onChange={(event) => setId(event.target.value)}
+                            value={friend}
+                            onChange={(event) => setFriend(event.target.value)}
                             className='tw-border tw-p-3'
                             type='text'
                         />
@@ -150,7 +189,7 @@ export default function Friends() {
                         <div className='tw-flex tw-flex-row'>
                             <Avatar alt="Profile" sx={{ width: 100, height: 100 }} src={friendInfo.photoURL} className="tw-my-8"/>
                             <div className='tw-flex-grow tw-flex tw-flex-col tw-items-center tw-justify-center'>
-                                <button onClick={handleConfirm} className='light tw-w-2/3 tw-rounded tw-mt-4 tw-py-2 tw-px-4'>confirm</button>
+                                <button onClick={handleConfirm} className='light tw-w-2/3 tw-rounded tw-mt-4 tw-py-2 tw-px-4'>send request</button>
                                 <button onClick={handleClickAway} className='tw-w-2/3 tw-rounded tw-mt-4 tw-py-2 tw-px-4 tw-bg-red-500 tw-text-white'>cancel</button>
                             </div>
                         </div>
@@ -159,6 +198,27 @@ export default function Friends() {
                             <p className="tw-text-black"> Email: {friendInfo.email}</p>
                         </div>
                     </div>
+                    </ClickAwayListener>
+                </div>
+            )}
+
+            {openReqList && (
+                <div className='tw-fixed tw-inset-0 tw-flex tw-items-center tw-justify-center tw-bg-gray-800 tw-bg-opacity-75'>
+                    <ClickAwayListener onClickAway={handleClickAway}>
+                        <div className='tw-w-1/3 tw-bg-white tw-p-6 tw-rounded-lg'>
+                            <h1 className='tw-font-bold tw-text-lg'>Username</h1>
+                            {requests.map((req, index) => (
+                                <div className="tw-flex-col">
+                                    <div key={index} className='tw-flex tw-flex-row tw-items-center'>
+                                        <div className='tw-basis-1/2 tw-mt-2'>{index + 1}. {req.username}</div>
+                                        <div className='tw-flex-grow tw-flex tw-flex-row tw-items-center tw-justify-center'>
+                                            <button className='light tw-w-2/3 tw-rounded tw-mx-2 tw-mt-4 tw-py-2 tw-px-4'>Accept</button>
+                                            <button className='tw-w-2/3 tw-rounded tw-mt-4 tw-py-2 tw-px-4 tw-bg-red-500 tw-text-white'>Decline</button>
+                                            </div>
+                                    </div>
+                                </div>
+                            ) )}
+                        </div>
                     </ClickAwayListener>
                 </div>
             )}

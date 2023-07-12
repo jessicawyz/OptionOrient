@@ -55,7 +55,7 @@ const Profile = () => {
 
       try {
         updateProfile(currUser, {photoURL});
-        const dbRef = doc(firestore,`${user.uid}`, `info`);
+        const dbRef = doc(firestore,`${user.displayName}`, `info`);
         await updateDoc(dbRef, {
           photoURL: photoURL,
         })

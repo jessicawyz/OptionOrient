@@ -17,17 +17,14 @@ export default function History() {
     const [weights, setWeights] = useState([]);
     const [names, setNames] = useState([]);
     const [fav, setFav] = useState([]);
-    //const user = UserAuth();
     const [user, loading] = useAuthState(auth);
 
-    const [uid, setUid] = useState(null);
+    const [username, setUsername] = useState(null);
     useEffect(() => {
         if (user) {
-            setUid(user.uid)
+            setUsername(user.displayName);
         }
     }, [user]);
-
-    const histRef = collection(firestore, `${uid}`, "decision", "history");
 
     useEffect(() => {
         try {
@@ -35,10 +32,11 @@ export default function History() {
         } catch(e) {
             console.log("Error getting history: " + e.message);
         }
-    }, [uid]);
+    }, [username]);
 
     async function getHistory() {
-        const q = await query(histRef, orderBy("time", "desc"), limit(5));
+        const histRef = collection(firestore, `${username}`, "decision", "history");
+        const q = query(histRef, orderBy("time", "desc"), limit(5));
         const docSnap = await getDocs(q);
             docSnap.forEach((doc) => {
                 namesA.push(doc.id);
@@ -81,8 +79,8 @@ export default function History() {
     }
 
     async function storeFav(name, options, weights, currentDate) {
-        const faveRef = doc(firestore, `${uid}`, "decision", "favourites", `${name}`);
-        const historyRef = doc(firestore, `${uid}`, "decision", "history", `${name}`);
+        const faveRef = doc(firestore, `${username}`, "decision", "favourites", `${name}`);
+        const historyRef = doc(firestore, `${username}`, "decision", "history", `${name}`);
 
         await setDoc(faveRef, {
             time: currentDate,
@@ -96,8 +94,8 @@ export default function History() {
       }
 
       async function deleteFav(name) {
-        const faveRef = doc(firestore, `${uid}`, "decision", "favourites", `${name}`);
-        const historyRef = doc(firestore, `${uid}`, `decision`, `history`, `${name}`);
+        const faveRef = doc(firestore, `${username}`, "decision", "favourites", `${name}`);
+        const historyRef = doc(firestore, `${username}`, `decision`, `history`, `${name}`);
         const document = await getDoc(faveRef);
         
         if (document.exists()) {
