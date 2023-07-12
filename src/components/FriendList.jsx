@@ -1,87 +1,58 @@
 import { React, useState, useEffect } from 'react';
-
-const people = [
-    {
-      name: 'Leslie Alexander',
-      email: 'leslie.alexander@example.com',
-      role: 'Co-Founder / CEO',
-      imageUrl:
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      lastSeen: '3h ago',
-      lastSeenDateTime: '2023-01-23T13:23Z',
-    },
-    {
-      name: 'Michael Foster',
-      email: 'michael.foster@example.com',
-      role: 'Co-Founder / CTO',
-      imageUrl:
-        'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      lastSeen: '3h ago',
-      lastSeenDateTime: '2023-01-23T13:23Z',
-    },
-    {
-      name: 'Dries Vincent',
-      email: 'dries.vincent@example.com',
-      role: 'Business Relations',
-      imageUrl:
-        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      lastSeen: null,
-    },
-    {
-      name: 'Lindsay Walton',
-      email: 'lindsay.walton@example.com',
-      role: 'Front-end Developer',
-      imageUrl:
-        'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      lastSeen: '3h ago',
-      lastSeenDateTime: '2023-01-23T13:23Z',
-    },
-    {
-      name: 'Courtney Henry',
-      email: 'courtney.henry@example.com',
-      role: 'Designer',
-      imageUrl:
-        'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      lastSeen: '3h ago',
-      lastSeenDateTime: '2023-01-23T13:23Z',
-    },
-    {
-      name: 'Tom Cook',
-      email: 'tom.cook@example.com',
-      role: 'Director of Product',
-      imageUrl:
-        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-      lastSeen: null,
-    },
-  ]
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { firestore, auth } from '../firebase';
+import { collection, query, getDocs, orderBy } from 'firebase/firestore';
+import Avatar from "@mui/material/Avatar";
+import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 
 export default function FriendList() {
+    const [user, loading] = useAuthState(auth);
+    const [friendList, setFriendList] = useState([]);
+    const [username, setUsername] = useState("");
+
+    useEffect(() => {
+      if (user) {
+          setUsername(user.displayName)
+      }
+    }, [user]);
+
+    useEffect(() => {
+      try {
+          getFriends();
+      } catch(e) {
+          console.log("Error getting requests: " + e.message);
+      }
+    }, [username]);
+
+    async function getFriends() {
+        try {
+          const reqRef = collection(firestore, `${username}`, "info", "friends");
+          const q = query(reqRef, orderBy("time", "desc"));
+          let friendArray = [];
+          const docSnap = await getDocs(q);
+          docSnap.forEach((doc) => {
+              friendArray.push(doc.data());
+          });
+
+          setFriendList(friendArray);
+        } catch(e) {
+          console.log("Error getting friends in friendList: " + e.message);
+        }
+
+    }
+
     return (
       <ul className="tw-overflow-y-auto tw-overflow-x-hidden">
-        {people.map((person) => (
-          <li key={person.email} className="tw-flex tw-justify-between tw-gap-x-6 tw-py-5">
+        {friendList.map((friend, index) => (
+          <li key={index} className="tw-flex tw-flex-row tw-justify-between tw-gap-x-6 tw-py-5">
             <div className="tw-flex tw-gap-x-4">
-              <img className="tw-h-12 tw-w-12 tw-flex-none tw-rounded-full tw-bg-gray-50" src={person.imageUrl} alt="" />
+              <Avatar alt="Friend profile" sx={{ width: 50, height: 50 }} src={friend.photoUrl} />
               <div className="tw-min-w-0 tw-flex-auto">
-                <p className="tw-text-sm tw-font-semibold tw-leading-6 tw-text-gray-900">{person.name}</p>
-                <p className="tw-mt-1 tw-truncate tw-text-xs tw-leading-5 tw-text-gray-500">{person.email}</p>
+                <div className="tw-text-lg tw-text-white">{friend.username}</div>
+                <p className="tw-mt-1 tw-truncate tw-text-xs tw-leading-5 tw-text-gray-500">{friend.email}</p>
               </div>
             </div>
-            <div className="tw-hidden sm:tw-flex sm:tw-flex-col sm:tw-items-end">
-              <p className="tw-text-sm tw-leading-6 tw-text-gray-900">{person.role}</p>
-              {person.lastSeen ? (
-                <p className="tw-mt-1 tw-text-xs tw-leading-5 tw-text-gray-500">
-                  Last seen <time dateTime={person.lastSeenDateTime}>{person.lastSeen}</time>
-                </p>
-              ) : (
-                <div className="tw-mt-1 tw-flex tw-items-center tw-gap-x-1.5">
-                  <div className="tw-flex-none tw-rounded-full bg-emerald-500/20 tw-p-1">
-                    <div className="tw-h-1.5 tw-w-1.5 tw-rounded-full bg-emerald-500" />
-                  </div>
-                  <p className="tw-text-xs tw-leading-5 tw-text-gray-500">Online</p>
-                </div>
-              )}
-            </div>
+            <QuestionAnswerIcon className='tw-text-white tw-basis-1/6'></QuestionAnswerIcon>
           </li>
         ))}
       </ul>

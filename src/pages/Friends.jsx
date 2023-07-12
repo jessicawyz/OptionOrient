@@ -5,7 +5,7 @@ import TopNav from "../components/TopNav";
 import FriendList from '../components/FriendList';
 import { firestore, auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { doc, getDoc, setDoc, collection, query, getDocs, orderBy } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, getDocs, orderBy, deleteDoc } from 'firebase/firestore';
 import ClickAwayListener from '@mui/base/ClickAwayListener';
 import Avatar from "@mui/material/Avatar";
 import Badge from '@mui/material/Badge';
@@ -143,7 +143,51 @@ export default function Friends() {
         await setRequests(reqArray);
     }
 
-    
+    async function declineReq(friend) {
+        console.log('decline');
+        const ownRef = doc(firestore, `${username}`, 'info', 'friends', `${friend.username}`);
+        try {
+            const docSnap = await getDoc(ownRef);
+
+            if (docSnap.exists()) {
+                await deleteDoc(ownRef);
+                alert("You have successfully declined the request");
+                window.location.reload(true);
+            }
+        } catch(e) {
+            console.log("Error removing request: " + e.message)
+        }
+    } 
+
+    async function acceptReq(friend) {
+        console.log('accept');
+        const friendRef = doc(firestore, `${friend.username}`, 'info', 'friends', `${username}`);
+        const ownRef = doc(firestore, `${username}`, 'info', 'friends', `${friend.username}`);
+        const reqRef = doc(firestore, `${username}`, 'info', 'requests', `${friend.username}`);
+        try { 
+            await setDoc(friendRef, {
+                uid: user.uid, 
+                email: user.email,
+                photoURL: user.photoURL,
+                username: user.displayName,
+                time: friend.time,
+            })
+
+            await setDoc(ownRef, friend);
+
+            const docSnap = await getDoc(reqRef);
+            if (docSnap.exists()) {
+                await deleteDoc(reqRef);
+            }
+
+            alert("Friend request approved successfully!");
+            window.location.reload(true);
+            
+        } catch(e) {
+            console.log("Error adding friends: " + e.message);
+        }
+
+    }
     return (
           <main>
             <div className='container-row tw-flex'>
@@ -202,7 +246,7 @@ export default function Friends() {
                 </div>
             )}
 
-            {openReqList && (
+            {openReqList && requests.length !== 0 && (
                 <div className='tw-fixed tw-inset-0 tw-flex tw-items-center tw-justify-center tw-bg-gray-800 tw-bg-opacity-75'>
                     <ClickAwayListener onClickAway={handleClickAway}>
                         <div className='tw-w-1/3 tw-bg-white tw-p-6 tw-rounded-lg'>
@@ -212,9 +256,9 @@ export default function Friends() {
                                     <div key={index} className='tw-flex tw-flex-row tw-items-center'>
                                         <div className='tw-basis-1/2 tw-mt-2'>{index + 1}. {req.username}</div>
                                         <div className='tw-flex-grow tw-flex tw-flex-row tw-items-center tw-justify-center'>
-                                            <button className='light tw-w-2/3 tw-rounded tw-mx-2 tw-mt-4 tw-py-2 tw-px-4'>Accept</button>
-                                            <button className='tw-w-2/3 tw-rounded tw-mt-4 tw-py-2 tw-px-4 tw-bg-red-500 tw-text-white'>Decline</button>
-                                            </div>
+                                            <button onClick={() => acceptReq(req)} className='light tw-w-2/3 tw-rounded tw-mx-2 tw-mt-4 tw-py-2 tw-px-4'>Accept</button>
+                                            <button onClick={() => declineReq(req)} className='tw-w-2/3 tw-rounded tw-mt-4 tw-py-2 tw-px-4 tw-bg-red-500 tw-text-white'>Decline</button>
+                                        </div>
                                     </div>
                                 </div>
                             ) )}
@@ -222,6 +266,8 @@ export default function Friends() {
                     </ClickAwayListener>
                 </div>
             )}
+
+            {openReqList && requests.length === 0 && alert("You have no pending requests!")}
 
         </main>
 
