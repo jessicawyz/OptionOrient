@@ -15,6 +15,7 @@ import Layout from './pages/Layout';
 import Home from './pages/Home';
 import Decide from './pages/Decide';
 import Friends from './pages/Friends';
+import Chats from './pages/Chats';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -59,6 +60,16 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Friends />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Chats */}
+            <Route
+              path="/chats"
+              element={
+                <ProtectedRoute>
+                  <Chats />
                 </ProtectedRoute>
               }
             />

@@ -92,14 +92,6 @@ export default function Friends() {
         setOpenReqList(false);
     }
 
-    /*
-    await setDoc(friendRef, {
-                uid: friendInfo.uid,
-                email: friendInfo.email,
-                photoURL: friendInfo.photoURL,
-                username: friendInfo.username,
-                time: currentDate,
-            });*/
     async function handleConfirm() {
         const friendRef = doc(firestore, `${friend}`, 'info', 'requests', `${username}`);
 

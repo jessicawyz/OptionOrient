@@ -4,6 +4,7 @@ import { firestore, auth } from '../firebase';
 import { collection, query, getDocs, orderBy } from 'firebase/firestore';
 import Avatar from "@mui/material/Avatar";
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
+import { Link } from 'react-router-dom';
 
 export default function FriendList() {
     const [user, loading] = useAuthState(auth);
@@ -52,7 +53,7 @@ export default function FriendList() {
                 <p className="tw-mt-1 tw-truncate tw-text-xs tw-leading-5 tw-text-gray-500">{friend.email}</p>
               </div>
             </div>
-            <QuestionAnswerIcon className='tw-text-white tw-basis-1/6'></QuestionAnswerIcon>
+            <Link to="/chats" state={{ friend: friend.username }}> <QuestionAnswerIcon className='tw-text-white tw-basis-1/6'></QuestionAnswerIcon> </Link>
           </li>
         ))}
       </ul>
