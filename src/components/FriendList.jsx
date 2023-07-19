@@ -53,7 +53,7 @@ export default function FriendList() {
                 <p className="tw-mt-1 tw-truncate tw-text-xs tw-leading-5 tw-text-gray-500">{friend.email}</p>
               </div>
             </div>
-            <Link to="/chats" state={{ friend: friend.username }}> <QuestionAnswerIcon className='tw-text-white tw-basis-1/6'></QuestionAnswerIcon> </Link>
+            <Link to="/chats" state={{ photoUrl: friend.photoUrl, friend: friend.username }}> <QuestionAnswerIcon className='tw-text-white tw-basis-1/6'></QuestionAnswerIcon> </Link>
           </li>
         ))}
       </ul>
