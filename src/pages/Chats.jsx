@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom';
 import FriendList from '../components/FriendList';
 import { firestore, auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
+import { useCollectionData } from 'react-firebase-hooks/firestore';
 import { doc, getDoc, setDoc, collection, query, getDocs, orderBy, updateDoc, deleteDoc } from 'firebase/firestore';
 import Avatar from '@mui/material/Avatar';
 
@@ -15,16 +16,25 @@ import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 export default function Chats() {
     const [user, loading] = useAuthState(auth);
+    const [openChat, setOpenChat] = useState(false);
+    const [messageInput, setMessageInput] = useState("");
+    const [username, setUsername] = useState("");
     const [currFriend, setCurrFriend] = useState("");
     const [friendPhoto, setFriendPhoto] = useState("");
-    const [openChat, setOpenChat] = useState(false);
-    const [messages, setMessages] = useState([]);
-    const [messageInput, setMessageInput] = useState("");
-
-    const [username, setUsername] = useState(null);
+    const [databaseLoading, setDatabaseLoading] = useState(false);
 
     const location = useLocation();
     const data = location.state;
+
+    useEffect(() => {
+        if (data) {
+        console.log("data present");
+          setOpenChat(true);
+          setCurrFriend(data.friend);
+          setFriendPhoto(data.PhotoURL);
+        }
+
+      }, [data]);
 
     useEffect(() => {
         if (user) {
@@ -32,25 +42,13 @@ export default function Chats() {
         }
     }, [user]);
 
-    useEffect(() => {
-        if (data) {
-            setOpenChat(true);
-            setCurrFriend(data.friend);
-            setFriendPhoto(data.photoURL);
-            console.log(data);
-        }
-    }, [data]);
-
-    useEffect(() => {
-        if (currFriend) {
-            getChatHistory();
-        }
-    })
-
     function handleClickAway() {
         setOpenChat(false);
     }
 
+    
+
+    /*let messagesArray =[];
     async function getChatHistory() {
         const msgRef = collection(firestore, `${username}`, 'chats', 'active', `${currFriend}`, 'messages');
         const q = query(msgRef, orderBy("time"));
@@ -66,44 +64,50 @@ export default function Chats() {
                 }
             })
 
-            setMessages(tempArray);
+            messagesArray = tempArray;
         } catch(e) {
             console.log("Error loading message history: " + e.message);
         }
-    }
+    }*/
 
-    async function handleSend() {
+    async function handleSend(event) {
+        event.preventDefault()
+        console.log("send");
         const date = await new Date();
 
-        var day = await ("0" + date.getDate()).slice(-2);
-        var month = await ("0" + (date.getMonth() + 1)).slice(-2);
-        var year = await date.getFullYear();
-        var time = await ("0" + date.getHours()).slice(-2) + ":" + 
-                        ("0" + date.getMinutes()).slice(-2) + ":" + 
-                        ("0" + date.getSeconds()).slice(-2);
+        var day = ("0" + date.getDate()).slice(-2);
+        var month = ("0" + (date.getMonth() + 1)).slice(-2);
+        var year = date.getFullYear();
+        var time = ("0" + date.getHours()).slice(-2) + ":" + 
+                    ("0" + date.getMinutes()).slice(-2) + ":" + 
+                    ("0" + date.getSeconds()).slice(-2);
         
-        var currentDate = await `${year}-${month}-${day} ` + time;
+        var currentDate = `${year}-${month}-${day} ` + time;
+        setDatabaseLoading(true);
 
-        //try {
+        try {
             const msgRef = doc(firestore, `${username}`, 'chats', 'active', `${currFriend}`, `messages`, `${currentDate}`);
             await setDoc(msgRef, {
                 content: messageInput,
                 time: currentDate,
                 author: username,
-                unread: true,
+                unread: false,
             })
 
             const friendRef = doc(firestore, `${currFriend}`, 'chats', 'active', `${username}`, `messages`, `${currentDate}`);
-            await updateDoc(friendRef, {
+            await setDoc(friendRef, {
                 content: messageInput,
                 time: currentDate,
                 author: username,
                 unread: true,
             })
 
+            console.log('done');
+            setDatabaseLoading(false);
+
             const ownRefInfo = doc(firestore, `${username}`, 'chats', 'active', `${currFriend}`);
             const friendRefInfo = doc(firestore, `${currFriend}`, 'chats', 'active', `${username}`);
-            await updateDoc(ownRefInfo, {
+            await setDoc(ownRefInfo, {
                 lastMessageTime: currentDate,
                 unread: 0,
             })
@@ -112,6 +116,7 @@ export default function Chats() {
 
             let newUnread = 0;
             if (friendSnap.unread) {
+                console.log("hehe");
                 newUnread = friendSnap.unread + 1;
             }
 
@@ -120,9 +125,10 @@ export default function Chats() {
                 unread: newUnread,
             })
 
-        /*} catch(e) {
+        } catch(e) {
             console.log("Error adding message sent to database: " + e.message);
-        }*/
+            setDatabaseLoading(false);
+        }
 
     }
 
@@ -144,8 +150,8 @@ export default function Chats() {
               
               <TopNav />
             </div>
-
-            { openChat && (
+            
+                { openChat && (
                 <div className='tw-fixed tw-inset-0 tw-flex tw-items-center tw-justify-center tw-bg-gray-800 tw-bg-opacity-75'>
                     <ClickAwayListener onClickAway={handleClickAway}>
                         <div className='chatBox tw-flex tw-flex-col tw-w-3/4 tw-h-full tw-rounded-lg'>
@@ -156,7 +162,8 @@ export default function Chats() {
                                 </div>
                             </div>
 
-                            <div className="chatSec tw-h-4/6 tw-mx-4"></div>
+                            <div className="chatSec tw-h-4/6 tw-mx-4">
+                            </div>
 
 
                             <form onSubmit={handleSend} className='tw-mx-4'>
@@ -178,6 +185,7 @@ export default function Chats() {
 
                 </div>
             )}
+                
         </main>
     )
 
