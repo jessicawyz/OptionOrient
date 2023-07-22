@@ -27,15 +27,17 @@ export default function FriendList() {
 
     async function getFriends() {
         try {
-          const reqRef = collection(firestore, `${username}`, "info", "friends");
-          const q = query(reqRef, orderBy("time", "desc"));
-          let friendArray = [];
-          const docSnap = await getDocs(q);
-          docSnap.forEach((doc) => {
-              friendArray.push(doc.data());
-          });
+          if (username) {
+            const reqRef = collection(firestore, `${username}`, "info", "friends");
+            const q = query(reqRef, orderBy("time", "desc"));
+            let friendArray = [];
+            const docSnap = await getDocs(q);
+            docSnap.forEach((doc) => {
+                friendArray.push(doc.data());
+            });
 
-          setFriendList(friendArray);
+            setFriendList(friendArray);
+          }
         } catch(e) {
           console.log("Error getting friends in friendList: " + e.message);
         }

@@ -18,9 +18,6 @@ export default function ChatList() {
     const [chatList, setChatList] = useState([]);
     const [chatLoading, setChatLoading] = useState(true);
 
-    const unread = 0;
-    const navigate = useNavigate()
-
     useEffect(() => {
         if (user) {
             setUsername(user.displayName);
@@ -44,21 +41,25 @@ export default function ChatList() {
       }, [chatList]);
 
       async function getChats() {
-        console.log("got chats");
         if (username) {
+            
+            console.log('tried getting');
             const reqRef = collection(firestore, `${username}`, "chats", "active");
             const q = query(reqRef, orderBy("lastMessageTime", "desc"));
 
-            let chatArray = [];
+    
             const docSnap = await getDocs(q);
-            docSnap.forEach(async (document) => {
+            const promises = docSnap.docs.map(async (document) => {
                 const friendRef = doc(firestore, `${document.id}`, 'info');
                 const friendSnap = await getDoc(friendRef);
-                chatArray.push({ displayName: document.id, photoURL: friendSnap.photoURL });
-            });
+                const unreadRef = doc(firestore, `${username}`, 'chats', 'active', `${document.id}`);
+                const unreadSnap = await getDoc(unreadRef);
+                return { displayName: document.id, photoURL: friendSnap.photoURL, unread: unreadSnap.data().unread || 0 };
+              });
+          
+              const chatArray = await Promise.all(promises);
 
             setChatList(chatArray);
-            console.log(chatArray);
             setChatLoading(false);
         }
     }
@@ -77,8 +78,8 @@ export default function ChatList() {
                             <Avatar alt="Friend profile" sx={{ width: 50, height: 50 }} src={friendData.photoURL} />
                             <Link to='/chats' className="tw-min-w-0 tw-flex-auto" state={{ photoURL: friendData.photoURL, friend: friendData.displayName}}>
                                 <div className="tw-text-lg tw-text-white">{friendData.displayName}</div>
-                                { unread !== 0 && (
-                                    <div className='tw-text-m tw-text-white'>{unread} unread messages</div>
+                                { friendData.unread !== 0 && (
+                                    <div className='tw-text-m tw-text-white'>{friendData.unread} unread messages</div>
                                 )}
                                 
                             </Link>

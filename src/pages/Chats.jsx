@@ -1,4 +1,4 @@
-import {React, useState, useEffect} from 'react';
+import {React, useState, useEffect, useRef} from 'react';
 import '../css/Chats.css';
 
 import SideNav from "../components/SideNav";
@@ -9,7 +9,7 @@ import FriendList from '../components/FriendList';
 import { firestore, auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { doc, getDoc, setDoc, collection, query, getDocs, orderBy, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, getDocs, orderBy, onSnapshot } from 'firebase/firestore';
 import Avatar from '@mui/material/Avatar';
 
 import ClickAwayListener from '@mui/base/ClickAwayListener';
@@ -22,19 +22,38 @@ export default function Chats() {
     const [currFriend, setCurrFriend] = useState("");
     const [friendPhoto, setFriendPhoto] = useState("");
     const [databaseLoading, setDatabaseLoading] = useState(false);
+    const [chatLoading, setChatLoading] = useState(false);
+    const [messageHistory, setMessageHistory] = useState([]);
 
     const location = useLocation();
-    const data = location.state;
+    let data = location.state;
+
+    
+    const dummy = useRef();
 
     useEffect(() => {
         if (data) {
-        console.log("data present");
           setOpenChat(true);
           setCurrFriend(data.friend);
           setFriendPhoto(data.PhotoURL);
+          getChatHistory();
+          window.history.replaceState({}, document.title);
         }
 
       }, [data]);
+
+      useEffect(() => {
+        if (username && currFriend) {
+          getChatHistory();
+        }
+      }, [username, currFriend]);
+
+
+    useEffect(() => {
+        if (dummy.current) {
+            dummy.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [messageHistory]);
 
     useEffect(() => {
         if (user) {
@@ -42,38 +61,51 @@ export default function Chats() {
         }
     }, [user]);
 
+
     function handleClickAway() {
+        window.history.replaceState({}, document.title);
         setOpenChat(false);
     }
 
     
 
-    /*let messagesArray =[];
     async function getChatHistory() {
-        const msgRef = collection(firestore, `${username}`, 'chats', 'active', `${currFriend}`, 'messages');
-        const q = query(msgRef, orderBy("time"));
-        const docSnap = await getDocs(q);
+        if (username && currFriend) {
+            const msgRef = collection(firestore, `${username}`, 'chats', 'active', `${currFriend}`, 'messages');
+            const q = query(msgRef, orderBy("time"));
+            setChatLoading(true);
 
-        let tempArray = [];
-        try {
-            docSnap.forEach((doc) => {
-                if (doc.data().author === username) {
-                    tempArray.push({ content: doc.data().content, self: true });
-                } else {
-                    tempArray.push({ content: doc.data().content, self: false });
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                let tempArray = [];
+                try {
+                    snapshot.forEach((doc) => {
+                        if (doc.data().author === username) {
+                            tempArray.push({ content: doc.data().content, self: true });
+                        } else {
+                            tempArray.push({ content: doc.data().content, self: false });
+                        }
+                    })
+
+                    setMessageHistory(tempArray);
+                    
+                    
+                } catch(e) {
+                    console.log("Error loading message history: " + e.message);
+                    setChatLoading(false);
                 }
+        
             })
 
-            messagesArray = tempArray;
-        } catch(e) {
-            console.log("Error loading message history: " + e.message);
+            setChatLoading(false);
+            return () => unsubscribe();
         }
-    }*/
+    }
+        
 
     async function handleSend(event) {
         event.preventDefault()
-        console.log("send");
-        const date = await new Date();
+        const date = new Date();
+        
 
         var day = ("0" + date.getDate()).slice(-2);
         var month = ("0" + (date.getMonth() + 1)).slice(-2);
@@ -85,10 +117,13 @@ export default function Chats() {
         var currentDate = `${year}-${month}-${day} ` + time;
         setDatabaseLoading(true);
 
+        const tempInput = messageInput;
+        setMessageInput("");
+
         try {
             const msgRef = doc(firestore, `${username}`, 'chats', 'active', `${currFriend}`, `messages`, `${currentDate}`);
             await setDoc(msgRef, {
-                content: messageInput,
+                content: tempInput,
                 time: currentDate,
                 author: username,
                 unread: false,
@@ -96,34 +131,39 @@ export default function Chats() {
 
             const friendRef = doc(firestore, `${currFriend}`, 'chats', 'active', `${username}`, `messages`, `${currentDate}`);
             await setDoc(friendRef, {
-                content: messageInput,
+                content: tempInput,
                 time: currentDate,
                 author: username,
                 unread: true,
             })
+            
 
-            console.log('done');
-            setDatabaseLoading(false);
 
             const ownRefInfo = doc(firestore, `${username}`, 'chats', 'active', `${currFriend}`);
             const friendRefInfo = doc(firestore, `${currFriend}`, 'chats', 'active', `${username}`);
+
             await setDoc(ownRefInfo, {
                 lastMessageTime: currentDate,
                 unread: 0,
             })
 
-            const friendSnap = getDoc(friendRefInfo);
+            const friendSnap = await getDoc(friendRefInfo);
 
             let newUnread = 0;
-            if (friendSnap.unread) {
-                console.log("hehe");
-                newUnread = friendSnap.unread + 1;
+            if (friendSnap.data() && typeof friendSnap.data().unread == 'number') {
+                newUnread = friendSnap.data().unread + 1;
+                console.log(newUnread);
             }
+            
 
             await setDoc(friendRefInfo, {
                 lastMessageTime: currentDate,
                 unread: newUnread,
             })
+
+
+            setDatabaseLoading(false);
+            
 
         } catch(e) {
             console.log("Error adding message sent to database: " + e.message);
@@ -136,7 +176,25 @@ export default function Chats() {
         setMessageInput(event.target.value);
     }
 
-    
+    function ChatMessage(props) {
+        const { self, content } = props.msg;
+
+        if (self) {
+            return (
+                <div className='tw-flex tw-flex-row sent tw-w-full'>
+                    <p className='chat'>{content}</p>
+                </div>
+            )
+        } else {
+            return (
+                <div className='tw-flex tw-flex-row receive tw-w-full'>
+                    <p className='chat'>{content}</p>
+                </div>
+            )
+        }
+
+        
+    }
     return (
         <main>
             <div className='container-row tw-flex'>
@@ -162,8 +220,21 @@ export default function Chats() {
                                 </div>
                             </div>
 
-                            <div className="chatSec tw-h-4/6 tw-mx-4">
+                            <div className="chatSec tw-h-4/6 tw-mx-4 tw-overflow-y-auto">
+                                <ul className="tw-w-full">
+                                    {messageHistory.map((message, index) => (
+                                        <li key={index} className="tw-flex tw-flex-row-reverse tw-justify-between tw-gap-x-6 tw-py-5 tw-w-full">
+                                            <ChatMessage key={index} msg={message}></ChatMessage>
+                                                
+                                        </li>
+                                        
+
+                                    ))}
+                                </ul>
+                                <div ref={dummy}></div>
+                                
                             </div>
+                            
 
 
                             <form onSubmit={handleSend} className='tw-mx-4'>
