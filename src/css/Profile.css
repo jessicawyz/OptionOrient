@@ -1,0 +1,8 @@
+input[type='file'] {
+    display: none;
+}
+
+.profileButton {
+    background-color: #2e5351;
+    cursor: pointer;
+}
