@@ -1,7 +1,7 @@
-import { React, useState, useEffect } from 'react';
+import { React, useState, useEffect, useRef } from 'react';
 import '../css/Home.css';
 import { firestore, auth } from '../firebase';
-import { getDocs, setDoc, updateDoc, doc, getDoc, collection, orderBy, query, limit, deleteDoc } from "firebase/firestore";
+import { getDocs, setDoc, updateDoc, doc, getDoc, collection, orderBy, query, limit, deleteDoc, onSnapshot } from "firebase/firestore";
 import { Link } from 'react-router-dom';
 import Checkbox from '@mui/material/Checkbox';
 import FavoriteBorder from '@mui/icons-material/FavoriteBorder';
@@ -9,17 +9,14 @@ import Favorite from '@mui/icons-material/Favorite';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function History() {
-    const optionsA = [];
-    const weightsA = [];
-    const namesA = [];
-    const favA = [];
     const [options, setOptions] = useState([]);
     const [weights, setWeights] = useState([]);
     const [names, setNames] = useState([]);
     const [fav, setFav] = useState([]);
     const [user, loading] = useAuthState(auth);
 
-    const [username, setUsername] = useState(null);
+    const [username, setUsername] = useState("");
+    const onSnapshotCallbackRef = useRef();
     useEffect(() => {
         if (user) {
             setUsername(user.displayName);
@@ -28,27 +25,52 @@ export default function History() {
 
     useEffect(() => {
         try {
-            getHistory();
+            if (username !== "") {
+                getHistory();
+            }
         } catch(e) {
             console.log("Error getting history: " + e.message);
         }
     }, [username]);
 
+    useEffect(() => {
+        return () => {
+          if (onSnapshotCallbackRef.current) {
+            onSnapshotCallbackRef.current();
+          }
+        };
+      }, []);
+
     async function getHistory() {
+        
         const histRef = collection(firestore, `${username}`, "decision", "history");
         const q = query(histRef, orderBy("time", "desc"), limit(5));
-        const docSnap = await getDocs(q);
-            docSnap.forEach((doc) => {
+        
+
+        if (onSnapshotCallbackRef.current) {
+            onSnapshotCallbackRef.current();
+          }
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            console.log('ssldjf');
+            const optionsA = [];
+            const weightsA = [];
+            const namesA = [];
+            const favA = [];
+            snapshot.forEach((doc) => {
                 namesA.push(doc.id);
                 optionsA.push(doc.data().options);
-                weightsA.push(doc.data().weights); 
+                weightsA.push(doc.data().weights);                     
                 favA.push(doc.data().favorite);
-        });
+            });
 
-        setNames(namesA);
-        setOptions(optionsA);
-        setWeights(weightsA); 
-        setFav(favA);
+            setNames(namesA);
+            setOptions(optionsA);
+            setWeights(weightsA); 
+            setFav(favA);
+            console.log(favA);
+        })
+
+        onSnapshotCallbackRef.current = unsubscribe;
     }
 
     function changeFav(event, index) {
@@ -99,7 +121,6 @@ export default function History() {
         const document = await getDoc(faveRef);
         
         if (document.exists()) {
-            console.log('exists');
             await deleteDoc(faveRef);
         }
 
@@ -108,13 +129,6 @@ export default function History() {
         });
       }
     
-      function verifyChecked(index) {
-        if (fav[index]) {
-            return true;
-        } else {
-            return false;
-        }
-      }
 
     return (
         <button className="history section">
@@ -130,7 +144,7 @@ export default function History() {
                                 {name} 
                             </Link>
                             <Checkbox
-                                defaultChecked={verifyChecked(index)}
+                                checked={fav[index]}
                                 icon={<FavoriteBorder className='tw-text-white'/>} 
                                 checkedIcon={<Favorite className='tw-text-white'/>}
                                 onChange={(event) => changeFav(event, index)} />
