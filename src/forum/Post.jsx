@@ -139,24 +139,33 @@ function Post({ post, handleSearchTag }) {
 
   return (
     <div>
-      <Card sx={{ minWidth: 275, minHeight: 250 }}>
-          <CardContent className="tw-h-full">
-            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-              {photoURL && (
-                <Avatar
-                  src={photoURL}
-                  alt="Profile"
-                  sx={{ width: 30, height: 30, marginRight: 5 }}
-                />
-              )}
-              {`${post.username}`}
-            </Typography>
-            <Typography variant="h5" className="tw-font-bold" component="div">
-              {`${post.title}`}
-            </Typography>
-            <Typography sx={{ mb: 1.5 }} color="text.secondary">
-              {post.content.length > 400 ? `${post.content.substring(0, 400)}...` : `${post.content}`}
-            </Typography>
+    <Card sx={{ minWidth: 275, minHeight: 20 , zIndex: 'modal'}}>
+        <CardContent className="tw-h-full">
+          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+            <div className='tw-flex tw-flex-row'>
+            {photoURL && (
+                  <Avatar
+                    src={photoURL}
+                    alt="Profile"
+                    sx={{ width: 30, height: 30 }}
+                    className='tw-me-2'
+                  />
+                )}
+              <div className='tw-mt-1'>{`${post.username}`}</div>
+            </div>
+          </Typography>
+          <Typography variant="h5" className='tw-font-bold' component="div">
+            {post.title.length > 40 ? 
+              (
+                `${post.title.substring(0, 40)}...`
+              ) : (`${post.title}`)}
+          </Typography>
+          <Typography sx={{ mb: 1.5 }} color="text.secondary">
+            {post.content.length > 400 ? 
+            (`${post.content.substring(0, 400)}...`) : (
+              `${post.content}`
+            )}
+          </Typography>
 
             <div className="tw-flex tw-flex-row">
               <button className="tw-mt-2 tw-flex tw-items-center tw-text-red-500" onClick={handleLikePost}>

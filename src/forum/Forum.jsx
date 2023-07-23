@@ -109,19 +109,16 @@ function Forum() {
           <div ref={dummy}></div>
           <div className="titleBar tw-flex tw-sticky tw-top-0 tw-mb-4 tw-p-2">
               <h1 className="tw-text-white tw-text-2xl tw-font-bold">Forum</h1>
-              <button onClick={handleScrollTop} className="tw-absolute tw-mt-2 tw-right-0 tw-text-white">Back to Top</button>
+              <button onClick={handleScrollTop} className="tw-absolute tw-mt-2 tw-right-0 tw-text-white hover:tw-text-gray-300">Back to Top</button>
           </div>
 
           
-          <div className="tw-flex tw-divide-4">
-            <Link to="/my-posts" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
+          <div className="tw-flex tw-divide-4 tw-w-full tw-my-2">
+            <Link to="/my-posts" className="tw-self-center tw-text-white hover:tw-text-gray-300 tw-mr-4 tw-h-min" >
               My Posts
             </Link>
-            <Link to="/sort-likes" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
+            <Link to="/sort-likes" className="tw-self-center tw-text-white hover:tw-text-gray-300 tw-mr-4 tw-h-min">
               Sort by Likes
-            </Link>
-            <Link to="/home" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
-              Home
             </Link>
 
             <div>
@@ -129,12 +126,12 @@ function Forum() {
               type="text"
               className="tw-text-black"
               value={searchTagContent}
-              onChange={(e) => setSearchTagContent(e.target.value)}
+              onChange={(e) =>
+                setSearchTagContent(e.target.value)}
             />
             <button
               className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-              onClick={() => {
-                handleSearchTag(searchTagContent); 
+              onClick={() => {handleSearchTag();
                 setIsSearching(true);
               }}
             >
@@ -154,15 +151,14 @@ function Forum() {
 
           </div>
           <form onSubmit={handleCreatePost} className="tw-mb-4">
-          <input
-              type="text"
-              className="tw-text-black tw-bg-white tw-rounded tw-p-2 tw-w-full tw-mb-2"
+          <textarea
+              className="tw-text-black tw-bg-white tw-rounded tw-p-2 tw-w-full tw-mb-2 tw-min-h-min"
               placeholder="Post Title"
               value={newPostTitle}
               onChange={(e) => setNewPostTitle(e.target.value)}
             />
             <textarea
-              className="tw-text-black tw-bg-white tw-rounded tw-p-2 tw-w-full"
+              className="tw-text-black tw-bg-white tw-rounded tw-p-2 tw-w-full tw-h-32 tw-min-h-min"
               value={newPostContent}
               onChange={(e) => setNewPostContent(e.target.value)}
             />
