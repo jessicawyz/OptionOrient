@@ -14,6 +14,8 @@ function Post({ post }) {
   const [filteredPosts, setFilteredPosts] = useState([]);
   const { user } = UserAuth();
 
+  
+
   const handleDeletePost = async () => {
     const postDoc = doc(firestore, 'posts', post.id);
 
@@ -80,10 +82,11 @@ function Post({ post }) {
   const handleCreateTag = async (e) => {
     e.preventDefault();
     if (newTagContent) {
+      console.log(newTagContent);
       const postDoc = doc(firestore, 'posts', post.id);
   
       await updateDoc(postDoc, {
-        tag: [...post.tag, newTagContent],
+        tag: [...post.tag, { content: newTagContent }],
       });
   
       setNewTagContent('');
@@ -156,6 +159,7 @@ function Post({ post }) {
           <FaRegHeart size={20} />
         )}
         <span className="tw-ml-2">{post.likes}</span>
+      </button>
 
         {post.tag && post.tag.length > 0 && (
         
@@ -168,7 +172,6 @@ function Post({ post }) {
         </div>
         )}
 
-      </button>
       <form onSubmit={handleCreateComment}>
         <textarea
           className="tw-text-black"

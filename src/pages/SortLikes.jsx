@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Post from './Post';
+import Post from '../forum/Post';
 import { collection, onSnapshot, addDoc } from 'firebase/firestore';
 import { firestore } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';

@@ -4,6 +4,9 @@ import { collection, onSnapshot, addDoc, query, where } from 'firebase/firestore
 import { firestore } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
+import SideNav from '../components/SideNav';
+import TopNav from '../components/TopNav';
+import '../css/Forum.css';
 
 function Forum() {
   const [posts, setPosts] = useState([]);
@@ -94,82 +97,88 @@ function Forum() {
   //forum only handles creating posts, plus all the functions that we need to navigate to other pages
 
   return (
-    <div className="tw-text-white">
-      <h1 className="tw-text-white tw-text-2xl tw-font-bold tw-mb-4">Forum</h1>
-      <div className="tw-flex tw-divide-4">
-        <Link to="/my-posts" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
-          My Posts
-        </Link>
-        <Link to="/sort-likes" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
-          Sort by Likes
-        </Link>
-        <Link to="/home" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
-          Home
-        </Link>
-        <div
-          className="login tw-text-white tw-cursor-pointer"
-          onClick={handleLogout}
-        >
-          Logout
+    <main>
+      <TopNav />
+      <div className='container-row centerAlign'>
+        <SideNav />
+        <div className='tw-text-white tw-flex-grow tw-mx-4 tw-flex tw-flex-col tw-h-full tw-overflow-y-auto'>
+          <h1 className="titleBar tw-sticky tw-top-0 tw-text-white tw-text-2xl tw-font-bold tw-mb-4 tw-p-2">Forum</h1>
+          <div className="tw-flex tw-divide-4">
+            <Link to="/my-posts" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
+              My Posts
+            </Link>
+            <Link to="/sort-likes" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
+              Sort by Likes
+            </Link>
+            <Link to="/home" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
+              Home
+            </Link>
+            <div
+              className="login tw-text-white tw-cursor-pointer"
+              onClick={handleLogout}
+            >
+              Logout
+            </div>
+
+            <div>
+            <input
+              type="text"
+              className="tw-text-black"
+              value={searchTagContent}
+              onChange={(e) =>
+                setSearchTagContent(e.target.value)}
+            />
+            <button
+              className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
+              onClick={() => {handleSearchTag();
+                setIsSearching(true);
+              }}
+            >
+              Search
+            </button>
+            <button
+              className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
+              onClick={() => {handleClearSearch();
+              }}
+            >
+              Clear
+            </button>
+          </div>
+
+          </div>
+          <form onSubmit={handleCreatePost} className="tw-mb-4">
+          <input
+              type="text"
+              className="tw-text-black tw-bg-white tw-rounded tw-p-2 tw-w-full tw-mb-2"
+              placeholder="Post Title"
+              value={newPostTitle}
+              onChange={(e) => setNewPostTitle(e.target.value)}
+            />
+            <textarea
+              className="tw-text-black tw-bg-white tw-rounded tw-p-2 tw-w-full"
+              value={newPostContent}
+              onChange={(e) => setNewPostContent(e.target.value)}
+            />
+            <button
+              className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-w-full tw-p-4 tw-mt-2 tw-text-white"
+              type="submit"
+            >
+              Create Post
+            </button>
+          </form>
+          {!isSearching ? (
+            posts.map((post) => (
+              <Post key={post.id} post={post} />
+            ))
+          ) : (
+            filteredPosts.map((post) => (
+              <Post key={post.id} post={post} />
+            ))
+          )}
         </div>
 
-        <div>
-        <input
-          type="text"
-          className="tw-text-black"
-          value={searchTagContent}
-          onChange={(e) =>
-            setSearchTagContent(e.target.value)}
-        />
-        <button
-          className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-          onClick={() => {handleSearchTag();
-            setIsSearching(true);
-          }}
-        >
-          Search
-        </button>
-        <button
-          className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-          onClick={() => {handleClearSearch();
-          }}
-        >
-          Clear
-        </button>
       </div>
-
-      </div>
-      <form onSubmit={handleCreatePost} className="tw-mb-4">
-      <input
-          type="text"
-          className="tw-text-black tw-bg-white tw-rounded tw-p-2 tw-w-full tw-mb-2"
-          placeholder="Post Title"
-          value={newPostTitle}
-          onChange={(e) => setNewPostTitle(e.target.value)}
-        />
-        <textarea
-          className="tw-text-black tw-bg-white tw-rounded tw-p-2 tw-w-full"
-          value={newPostContent}
-          onChange={(e) => setNewPostContent(e.target.value)}
-        />
-        <button
-          className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-w-full tw-p-4 tw-mt-2 tw-text-white"
-          type="submit"
-        >
-          Create Post
-        </button>
-      </form>
-      {!isSearching ? (
-        posts.map((post) => (
-          <Post key={post.id} post={post} />
-        ))
-      ) : (
-        filteredPosts.map((post) => (
-          <Post key={post.id} post={post} />
-        ))
-      )}
-
-    </div>
+    </main>
   );
 }
 

@@ -14,8 +14,8 @@ import Profile from './components/Profile';
 import Layout from './pages/Layout';
 import Home from './pages/Home';
 import Decide from './pages/Decide';
-import Forum from './pages/Forum';
-import MyPosts from './pages/MyPosts';
+import Forum from './forum/Forum';
+import MyPosts from './forum/MyPosts';
 import SortLikes from './pages/SortLikes';
 import NotFound from './pages/NotFound';
 
