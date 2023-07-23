@@ -1,0 +1,8 @@
+.titleBar {
+    background: #07141a;
+}
+
+.topButton {
+    display: flex;
+    justify-content: flex-end;
+}

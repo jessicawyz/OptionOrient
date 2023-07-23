@@ -5,6 +5,12 @@ import { firestore } from '../firebase';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
 import { UserAuth } from '../context/AuthContext';
 
+import Card from '@mui/material/Card';
+import { CardActionArea } from '@mui/material';
+import CardContent from '@mui/material/CardContent';
+import { Typography } from '@mui/material';
+import LocalOfferIcon from '@mui/icons-material/LocalOffer';
+
 function Post({ post }) {
   const [newCommentContent, setNewCommentContent] = useState('');
   const [newTagContent, setNewTagContent] = useState('');
@@ -13,6 +19,8 @@ function Post({ post }) {
   const [editedContent, setEditedContent] = useState(post.content);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const { user } = UserAuth();
+
+  
 
   const handleDeletePost = async () => {
     const postDoc = doc(firestore, 'posts', post.id);
@@ -80,10 +88,11 @@ function Post({ post }) {
   const handleCreateTag = async (e) => {
     e.preventDefault();
     if (newTagContent) {
+      console.log(newTagContent);
       const postDoc = doc(firestore, 'posts', post.id);
   
       await updateDoc(postDoc, {
-        tag: [...post.tag, newTagContent],
+        tag: [...post.tag, { content: newTagContent }],
       });
   
       setNewTagContent('');
@@ -102,108 +111,154 @@ function Post({ post }) {
   }, []);
 
   return (
-    <div>
-      <h2>{post.title}</h2>
-      {isEditing ? (
-        <textarea
-          className="tw-text-black"
-          value={editedContent}
-          onChange={(e) => setEditedContent(e.target.value)}
-        />
-      ) : (
-        <p>{post.content}</p>
-      )}
-      {user.uid === post.userId && (
-        <div>
-          {isEditing ? (
-            <>
-              <button
-                className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-                onClick={handleSavePost}
-              >
-                Save
-              </button>
-              <button
-                className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-                onClick={handleCancelEdit}
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <button
-              className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-              onClick={handleEditPost}
-            >
-              Edit
-            </button>
-          )}
-          <button
-            className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-            onClick={handleDeletePost}
-          >
-            Delete
+    <>
+    <Card sx={{ minWidth: 275, minHeight: 250 }}>
+      <CardActionArea className='tw-h-full'>
+        <CardContent className="tw-h-full">
+          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+            {`Post by ${post.username}`}
+          </Typography>
+          <Typography variant="h5" className='tw-font-bold' component="div">
+            {`${post.title}`}
+          </Typography>
+          <Typography sx={{ mb: 1.5 }} color="text.secondary">
+            {post.content.length > 400 ? 
+            (`${post.content.substring(0, 400)}...`) : (
+              `${post.content}`
+            )}
+          </Typography>
+
+        <div className='tw-flex tw-flex-row'>
+          <button className="tw-mt-2 tw-flex tw-items-center tw-text-red-500" 
+            onClick={handleLikePost}>
+            {post.likedBy && post.likedBy.includes(user.uid) ? (
+              <FaHeart size={20} />
+            ) : (
+              <FaRegHeart size={20} />
+            )}
+            <span className="tw-ml-2">{post.likes}</span>
           </button>
+            <LocalOfferIcon className='tw-mt-3 tw-flex tw-items-center tw-text-black tw-ms-6' />
+            {post.tag && post.tag.length > 0 ? (
+              post.tag.map((tag, index) => (
+                <div key={index} className="tw-mt-2 tw-text-black tw-ms-2 tw-p-1 tw-flex tw-items-center tw-rounded-full tw-px-2 tw-bg-gray-200">
+                {tag.content}
+                </div>
+              ))
+            ) : (
+              <p className='tw-mt-2 tw-ms-1 tw-p-1 tw-flex tw-items-center tw-text-gray-600'> No tags yet </p>
+            )}
         </div>
-      )}
-      <button
-        className="tw-mt-2 tw-flex tw-items-center tw-text-red-500 relative"
-        onClick={handleLikePost}
-      >
-        {post.likedBy && post.likedBy.includes(user.uid) ? (
-          <FaHeart size={20} />
-        ) : (
-          <FaRegHeart size={20} />
-        )}
-        <span className="tw-ml-2">{post.likes}</span>
-
-        {post.tag && post.tag.length > 0 && (
+          
+        </CardContent>
         
-        <div className="tw-ml-4 tw-flex">
-          {post.tag.map((tag, index) => (
-            <p key={index} className="tw-border-2 tw-mr-2">
-            {tag.content}
-            </p>
-          ))}
-        </div>
-        )}
+      </CardActionArea>
+    </Card>
 
+<div>
+<h2>{post.title}</h2>
+{isEditing ? (
+  <textarea
+    className="tw-text-black"
+    value={editedContent}
+    onChange={(e) => setEditedContent(e.target.value)}
+  />
+) : (
+  <p>{post.content}</p>
+)}
+{user.uid === post.userId && (
+  <div>
+    {isEditing ? (
+      <>
+        <button
+          className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
+          onClick={handleSavePost}
+        >
+          Save
+        </button>
+        <button
+          className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
+          onClick={handleCancelEdit}
+        >
+          Cancel
+        </button>
+      </>
+    ) : (
+      <button
+        className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
+        onClick={handleEditPost}
+      >
+        Edit
       </button>
-      <form onSubmit={handleCreateComment}>
-        <textarea
-          className="tw-text-black"
-          value={newCommentContent}
-          onChange={(e) => setNewCommentContent(e.target.value)}
-        />
-        <button
-          className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-          type="submit"
-        >
-          Add Comment
-        </button>
-      </form>
+    )}
+    <button
+      className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
+      onClick={handleDeletePost}
+    >
+      Delete
+    </button>
+  </div>
+)}
+<button
+  className="tw-mt-2 tw-flex tw-items-center tw-text-red-500 relative"
+  onClick={handleLikePost}
+>
+  {post.likedBy && post.likedBy.includes(user.uid) ? (
+    <FaHeart size={20} />
+  ) : (
+    <FaRegHeart size={20} />
+  )}
+  <span className="tw-ml-2">{post.likes}</span>
+</button>
 
-      <form onSubmit={handleCreateTag}>
-        <input
-          type="text"
-          className="tw-text-black"
-          value={newTagContent}
-          onChange={(e) => setNewTagContent(e.target.value)}
-        />
-        <button
-          className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-          type="submit"
-        >
-          Add Tag
-        </button>
-      </form>
+  {post.tag && post.tag.length > 0 && (
+  
+  <div className="tw-ml-4 tw-flex">
+    {post.tag.map((tag, index) => (
+      <p key={index} className="tw-border-2 tw-mr-2">
+      {tag.content}
+      </p>
+    ))}
+  </div>
+  )}
 
-      {post.comments.map((comment) => (
-        <div key={comment.id}>
-          <p>{comment.content}</p>
-        </div>
-      ))}
-    </div>
+<form onSubmit={handleCreateComment}>
+  <textarea
+    className="tw-text-black"
+    value={newCommentContent}
+    onChange={(e) => setNewCommentContent(e.target.value)}
+  />
+  <button
+    className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
+    type="submit"
+  >
+    Add Comment
+  </button>
+</form>
+
+<form onSubmit={handleCreateTag}>
+  <input
+    type="text"
+    className="tw-text-black"
+    value={newTagContent}
+    onChange={(e) => setNewTagContent(e.target.value)}
+  />
+  <button
+    className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
+    type="submit"
+  >
+    Add Tag
+  </button>
+</form>
+
+{post.comments.map((comment) => (
+  <div key={comment.id}>
+    <p>{comment.content}</p>
+  </div>
+))}
+</div>
+</>
+    
   );
 }
 
