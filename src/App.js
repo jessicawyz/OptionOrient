@@ -14,10 +14,11 @@ import Profile from './components/Profile';
 import Layout from './pages/Layout';
 import Home from './pages/Home';
 import Decide from './pages/Decide';
+import NotFound from './pages/NotFound';
+
 import Forum from './forum/Forum';
 import MyPosts from './forum/MyPosts';
-import SortLikes from './pages/SortLikes';
-import NotFound from './pages/NotFound';
+import SortLikes from './forum/SortLikes';
 
 function App() {
   return (
