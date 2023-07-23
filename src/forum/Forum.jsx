@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Post from './Post';
-import { collection, onSnapshot, addDoc, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, query, where, doc, getDoc } from 'firebase/firestore';
 import { firestore } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
@@ -18,6 +18,8 @@ function Forum() {
   const { user, logout } = UserAuth();
   const navigate = useNavigate();
 
+  const currUser = UserAuth();
+
   const dummy = useRef();
 
 
@@ -26,23 +28,26 @@ function Forum() {
       const postsCollection = collection(firestore, 'posts');
     
       const unsubscribe = onSnapshot(postsCollection, (snapshot) => {
-        const postsData = snapshot.docs
-          .map((doc) => ({ id: doc.id, ...doc.data() }))
-          // Sort posts by creating timestamp in descending order, newer posts should appear on top
-          .sort((a, b) => b.createdAt - a.createdAt); 
+        const postsData = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+          };
+        }).sort((a, b) => b.createdAt - a.createdAt);
         if (!isSearching) {
           setPosts(postsData);
         } else {
           setFilteredPosts(postsData);
         }
-
       });
     
       return unsubscribe;
     };
-
+    
     fetchPosts();
   }, []);
+
 
   const handleCreatePost = async (e) => {
     e.preventDefault();
@@ -57,7 +62,7 @@ function Forum() {
         likes: 0,
         username: user.displayName,
         userId: user.uid,
-        createdAt: new Date(), // to sort the posts with creation time
+        createdAt: new Date(), // to sort the posts in creation time
         tag: [],
       });
   
@@ -65,6 +70,8 @@ function Forum() {
       setNewPostContent('');
     }
   };
+  
+  
 
   const handleSearchTag = async () => {
     if (searchTagContent) {
