@@ -19,6 +19,7 @@ import NotFound from './pages/NotFound';
 import Forum from './forum/Forum';
 import MyPosts from './forum/MyPosts';
 import SortLikes from './forum/SortLikes';
+import PostDetails from './forum/PostDetails'
 
 function App() {
   return (
@@ -82,6 +83,16 @@ function App() {
               element={
                 <ProtectedRoute>
                   <SortLikes />
+                </ProtectedRoute>
+              }
+            />
+
+            { /*post details page*/ }
+            <Route
+              path="/post-details"
+              element={
+                <ProtectedRoute>
+                  <PostDetails />
                 </ProtectedRoute>
               }
             />
