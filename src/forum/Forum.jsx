@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Post from './Post';
-import { collection, onSnapshot, addDoc, query, where, doc, getDoc } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, query, where, doc, getDocs } from 'firebase/firestore';
 import { firestore } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
@@ -73,17 +73,16 @@ function Forum() {
   
   
 
-  const handleSearchTag = async () => {
+  const handleSearchTag = async (searchTagContent) => {
     if (searchTagContent) {
       const postsCollection = collection(firestore, 'posts');
       const searchQuery = query(postsCollection, where('tag', 'array-contains-any', [{ content: searchTagContent.toLowerCase() }]));
-  
-      const unsubscribe = onSnapshot(searchQuery, (snapshot) => {
-        const searchResults = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        setFilteredPosts(searchResults);
-      });
-  
-      return unsubscribe;
+
+      const snapshot = await getDocs(searchQuery);
+      const searchResults = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      setFilteredPosts(searchResults);
+    } else {
+      setFilteredPosts([]); 
     }
   };
   
@@ -130,12 +129,12 @@ function Forum() {
               type="text"
               className="tw-text-black"
               value={searchTagContent}
-              onChange={(e) =>
-                setSearchTagContent(e.target.value)}
+              onChange={(e) => setSearchTagContent(e.target.value)}
             />
             <button
               className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-              onClick={() => {handleSearchTag();
+              onClick={() => {
+                handleSearchTag(searchTagContent); 
                 setIsSearching(true);
               }}
             >
@@ -143,7 +142,10 @@ function Forum() {
             </button>
             <button
               className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-              onClick={() => {handleClearSearch();
+              onClick={() => {
+                setSearchTagContent('');
+                handleSearchTag(''); 
+                setIsSearching(false);
               }}
             >
               Clear
@@ -172,14 +174,14 @@ function Forum() {
             </button>
           </form>
           {!isSearching ? (
-            posts.map((post) => (
-              <Post key={post.id} post={post} />
-            ))
-          ) : (
-            filteredPosts.map((post) => (
-              <Post key={post.id} post={post} />
-            ))
-          )}
+          posts.map((post) => (
+            <Post key={post.id} post={post} handleSearchTag={handleSearchTag} />
+          ))
+        ) : (
+          filteredPosts.map((post) => (
+            <Post key={post.id} post={post} handleSearchTag={handleSearchTag} /> 
+          ))
+        )}
         </div>
 
       </div>

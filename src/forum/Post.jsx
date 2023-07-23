@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { deleteDoc, updateDoc, arrayUnion, setDoc, doc, collection, onSnapshot } from 'firebase/firestore';
+import React, { useState, useEffect, useRef } from 'react';
+import { deleteDoc, updateDoc, arrayUnion, setDoc, doc, collection, onSnapshot, query, where } from 'firebase/firestore';
 import { increment } from 'firebase/firestore';
 import { firestore, storage } from '../firebase';
 import { FaRegHeart, FaHeart } from 'react-icons/fa';
@@ -13,15 +13,18 @@ import { Typography } from '@mui/material';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import Avatar from "@mui/material/Avatar";
 
-function Post({ post }) {
+function Post({ post, handleSearchTag }) {
   const [newCommentContent, setNewCommentContent] = useState('');
   const [newTagContent, setNewTagContent] = useState('');
   const [searchTagContent, setSearchTagContent] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [editedContent, setEditedContent] = useState(post.content);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [photoURL, setPhotoURL] = useState(null);
   const { user } = UserAuth();
+
+  const dummy = useRef();
 
   const handleDeletePost = async () => {
     const postDoc = doc(firestore, 'posts', post.id);
@@ -96,7 +99,20 @@ function Post({ post }) {
     }
   };
 
-  useEffect(() => {
+  
+  function handleScrollTop() {
+    console.log("scroll");
+    dummy.current.scrollIntoView({ behavior: 'smooth' });
+
+  }
+
+  const handleTagClick = (tag) => {
+    console.log('this is a tag click')
+    handleSearchTag(tag.content); 
+  };
+
+
+  /*useEffect(() => {
     const postsCollection = collection(firestore, 'posts');
     const unsubscribe = onSnapshot(postsCollection, (snapshot) => {
       const postsData = snapshot.docs
@@ -105,7 +121,7 @@ function Post({ post }) {
       setFilteredPosts(postsData);
     });
     return unsubscribe;
-  }, []);
+  }, []);*/
 
   useEffect(() => {
     if (post.userId) {
@@ -124,7 +140,6 @@ function Post({ post }) {
   return (
     <div>
       <Card sx={{ minWidth: 275, minHeight: 250 }}>
-        <CardActionArea className="tw-h-full">
           <CardContent className="tw-h-full">
             <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
               {photoURL && (
@@ -152,19 +167,28 @@ function Post({ post }) {
                 )}
                 <span className="tw-ml-2">{post.likes}</span>
               </button>
+              
               <LocalOfferIcon className="tw-mt-3 tw-flex tw-items-center tw-text-black tw-ms-6" />
+
               {post.tag && post.tag.length > 0 ? (
-                post.tag.map((tag, index) => (
-                  <div key={index} className="tw-mt-2 tw-text-black tw-ms-2 tw-p-1 tw-flex tw-items-center tw-rounded-full tw-px-2 tw-bg-gray-200">
-                    {tag.content}
-                  </div>
-                ))
-              ) : (
-                <p className="tw-mt-2 tw-ms-1 tw-p-1 tw-flex tw-items-center tw-text-gray-600"> No tags yet </p>
-              )}
+            <span className="tw-flex tw-flex-wrap tw-items-center">
+              {post.tag.map((tag, index) => (
+                <span
+                  key={index}
+                  className="tw-mt-2 tw-text-black tw-ms-2 tw-p-1 tw-flex tw-items-center tw-rounded-full tw-px-2 tw-bg-gray-200"
+                  onClick={() => handleTagClick(tag)}
+                >
+                  {tag.content}
+                </span>
+              ))}
+            </span>
+          ) : (
+            <p className="tw-mt-2 tw-ms-1 tw-p-1 tw-flex tw-items-center tw-text-gray-600">
+              No tags yet
+            </p>
+          )}
             </div>
           </CardContent>
-        </CardActionArea>
       </Card>
 
       <div>
