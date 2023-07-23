@@ -19,20 +19,19 @@ export default function Favourites() {
     //const user = UserAuth();
 
     const [user, loading] = useAuthState(auth);
-    const [uid, setUid] = useState(null);
+    const [username, setUsername] = useState(null);
     useEffect(() => {
         if (user) {
-            setUid(user.uid)
+            setUsername(user.displayName);
         }
     }, [user]);
 
-    const favRef = collection(firestore, `${uid}`, "decision", "favourites");
-    
     useEffect(() => {
         getFavs();
-    }, [uid]);
+    }, [username]);
 
     async function getFavs() {
+        const favRef = collection(firestore, `${username}`, "decision", "favourites");
         const q = await query(favRef, orderBy("time", "desc"), limit(50));
         const docSnap = await getDocs(q);
             docSnap.forEach((doc) => {
@@ -65,8 +64,8 @@ export default function Favourites() {
     }
 
     async function storeFav(name, options, weights, currentDate) {
-        const faveRef = doc(firestore, `${uid}`, "decision", "favourites", `${name}`);
-        const historyRef = doc(firestore, `${uid}`, "decision", "history", `${name}`);
+        const faveRef = doc(firestore, username, "decision", "favourites", `${name}`);
+        const historyRef = doc(firestore, username, "decision", "history", `${name}`);
 
         await setDoc(faveRef, {
             time: currentDate,
@@ -80,8 +79,8 @@ export default function Favourites() {
       }
 
       async function deleteFav(name) {
-        const faveRef = doc(firestore, `${uid}`, "decision", "favourites", `${name}`);
-        const historyRef = doc(firestore, `${uid}`, `decision`, `history`, `${name}`);
+        const faveRef = doc(firestore, username, "decision", "favourites", `${name}`);
+        const historyRef = doc(firestore, username, `decision`, `history`, `${name}`);
         const document = await getDoc(faveRef);
         
         if (document.exists()) {

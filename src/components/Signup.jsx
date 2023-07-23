@@ -27,6 +27,8 @@ const Signup = () => {
     } catch (e) {
       if (e.message === 'Error creating user: Firebase: Error (auth/email-already-in-use).') {
         setError('Email address is already in use');
+      } else if (e.message === 'Error creating user: Username already exists') {
+        setError('Username already exists');
       } else {
         console.log(e.code);
         setError(e.message);

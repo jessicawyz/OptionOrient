@@ -6,7 +6,8 @@ import {
   onAuthStateChanged,
   updateProfile
 } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, firestore } from '../firebase';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 const UserContext = createContext();
 
@@ -15,10 +16,24 @@ export const AuthContextProvider = ({ children }) => {
 
   const createUser = async (email, password, username) => {
     try {
+      const rootRef = doc(firestore, username, 'info');
+      const rootSnap = await getDoc(rootRef);
+      if (rootSnap.exists()) {
+        throw new Error("Username already exists");
+      }
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       // Update the user's display name with the provided username
       await updateProfile(user, { displayName: username });
+      const dbRef = doc(firestore, username, `info`);
+
+      await setDoc(dbRef, {
+        username: username,
+        uid: user.uid,
+        email: email,
+        photoURL: null,
+      })
+
       setUser(user);
       return user;
     } catch (error) {
