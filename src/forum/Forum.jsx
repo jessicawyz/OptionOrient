@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Post from './Post';
 import { collection, onSnapshot, addDoc, query, where } from 'firebase/firestore';
 import { firestore } from '../firebase';
@@ -18,15 +18,8 @@ function Forum() {
   const { user, logout } = UserAuth();
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/');
-      console.log('logged out');
-    } catch (e) {
-      console.log(e.message);
-    }
-  };
+  const dummy = useRef();
+
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -62,6 +55,7 @@ function Forum() {
         comments: [],
         likedBy: [],
         likes: 0,
+        username: user.displayName,
         userId: user.uid,
         createdAt: new Date(), // to sort the posts with creation time
         tag: [],
@@ -93,7 +87,11 @@ function Forum() {
     setSearchTagContent('');
   };
   
+  function handleScrollTop() {
+    console.log("scroll");
+    dummy.current.scrollIntoView({ behavior: 'smooth' });
 
+  }
   //forum only handles creating posts, plus all the functions that we need to navigate to other pages
 
   return (
@@ -102,7 +100,13 @@ function Forum() {
       <div className='container-row centerAlign'>
         <SideNav />
         <div className='tw-text-white tw-flex-grow tw-mx-4 tw-flex tw-flex-col tw-h-full tw-overflow-y-auto'>
-          <h1 className="titleBar tw-sticky tw-top-0 tw-text-white tw-text-2xl tw-font-bold tw-mb-4 tw-p-2">Forum</h1>
+          <div ref={dummy}></div>
+          <div className="titleBar tw-flex tw-sticky tw-top-0 tw-mb-4 tw-p-2">
+              <h1 className="tw-text-white tw-text-2xl tw-font-bold">Forum</h1>
+              <button onClick={handleScrollTop} className="tw-absolute tw-mt-2 tw-right-0 tw-text-white">Back to Top</button>
+          </div>
+
+          
           <div className="tw-flex tw-divide-4">
             <Link to="/my-posts" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
               My Posts
@@ -113,12 +117,6 @@ function Forum() {
             <Link to="/home" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
               Home
             </Link>
-            <div
-              className="login tw-text-white tw-cursor-pointer"
-              onClick={handleLogout}
-            >
-              Logout
-            </div>
 
             <div>
             <input
