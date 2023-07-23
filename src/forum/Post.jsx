@@ -123,49 +123,58 @@ function Post({ post }) {
 
   return (
     <div>
-      <Card sx={{ minWidth: 275, minHeight: 250 }}>
-        <CardActionArea className="tw-h-full">
-          <CardContent className="tw-h-full">
-            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-              {photoURL && (
-                <Avatar
-                  src={photoURL}
-                  alt="Profile"
-                  sx={{ width: 30, height: 30, marginRight: 5 }}
-                />
-              )}
-              {`${post.username}`}
-            </Typography>
-            <Typography variant="h5" className="tw-font-bold" component="div">
-              {`${post.title}`}
-            </Typography>
-            <Typography sx={{ mb: 1.5 }} color="text.secondary">
-              {post.content.length > 400 ? `${post.content.substring(0, 400)}...` : `${post.content}`}
-            </Typography>
-
-            <div className="tw-flex tw-flex-row">
-              <button className="tw-mt-2 tw-flex tw-items-center tw-text-red-500" onClick={handleLikePost}>
-                {post.likedBy && post.likedBy.includes(user.uid) ? (
-                  <FaHeart size={20} />
-                ) : (
-                  <FaRegHeart size={20} />
+    <Card sx={{ minWidth: 275, minHeight: 20 , zIndex: 'modal'}}>
+        <CardContent className="tw-h-full">
+          <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+            <div className='tw-flex tw-flex-row'>
+            {photoURL && (
+                  <Avatar
+                    src={photoURL}
+                    alt="Profile"
+                    sx={{ width: 30, height: 30 }}
+                    className='tw-me-2'
+                  />
                 )}
-                <span className="tw-ml-2">{post.likes}</span>
-              </button>
-              <LocalOfferIcon className="tw-mt-3 tw-flex tw-items-center tw-text-black tw-ms-6" />
-              {post.tag && post.tag.length > 0 ? (
-                post.tag.map((tag, index) => (
-                  <div key={index} className="tw-mt-2 tw-text-black tw-ms-2 tw-p-1 tw-flex tw-items-center tw-rounded-full tw-px-2 tw-bg-gray-200">
-                    {tag.content}
-                  </div>
-                ))
-              ) : (
-                <p className="tw-mt-2 tw-ms-1 tw-p-1 tw-flex tw-items-center tw-text-gray-600"> No tags yet </p>
-              )}
+              <div className='tw-mt-1'>{`${post.username}`}</div>
             </div>
-          </CardContent>
-        </CardActionArea>
-      </Card>
+          </Typography>
+          <Typography variant="h5" className='tw-font-bold' component="div">
+            {post.title.length > 40 ? 
+              (
+                `${post.title.substring(0, 40)}...`
+              ) : (`${post.title}`)}
+          </Typography>
+          <Typography sx={{ mb: 1.5 }} color="text.secondary">
+            {post.content.length > 400 ? 
+            (`${post.content.substring(0, 400)}...`) : (
+              `${post.content}`
+            )}
+          </Typography>
+
+        <div className='tw-flex tw-flex-row'>
+          <button className="tw-mt-2 tw-flex tw-items-center tw-text-red-500" 
+            onClick={handleLikePost}>
+            {post.likedBy && post.likedBy.includes(user.uid) ? (
+              <FaHeart size={20} />
+            ) : (
+              <FaRegHeart size={20} />
+            )}
+            <span className="tw-ml-2">{post.likes}</span>
+          </button>
+            <LocalOfferIcon className='tw-mt-3 tw-flex tw-items-center tw-text-black tw-ms-6' />
+            {post.tag && post.tag.length > 0 ? (
+              post.tag.map((tag, index) => (
+                <div key={index} className="tw-mt-2 tw-text-black tw-ms-2 tw-p-1 tw-flex tw-items-center tw-rounded-full tw-px-2 tw-bg-gray-200">
+                {tag.content}
+                </div>
+              ))
+            ) : (
+              <p className='tw-mt-2 tw-ms-1 tw-p-1 tw-flex tw-items-center tw-text-gray-600'> No tags yet </p>
+            )}
+        </div>
+          
+        </CardContent>
+    </Card>
 
       <div>
         <h2>{post.title}</h2>

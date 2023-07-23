@@ -1,5 +1,6 @@
 .titleBar {
-    background: #07141a;
+    background-color: #07141a;
+    z-index: 1400;
 }
 
 .topButton {

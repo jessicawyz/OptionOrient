@@ -1,24 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { firestore } from '../firebase';
 import Post from './Post';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
+import SideNav from '../components/SideNav';
+import TopNav from '../components/TopNav';
+import '../css/Forum.css';
 
 function MyPosts() {
   const [posts, setPosts] = useState([]);
   const { user, logout } = UserAuth();
-  const navigate = useNavigate();
+  
+  const dummy = useRef();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/');
-      console.log('logged out');
-    } catch (e) {
-      console.log(e.message);
-    }
-  };
 
   useEffect(() => {
     if (user.uid) {
@@ -38,22 +33,28 @@ function MyPosts() {
     }
   }, [user]);
 
+  function handleScrollTop() {
+    console.log("scroll");
+    dummy.current.scrollIntoView({ behavior: 'smooth' });
+
+  }
+
   return (
-    <div>
-      <h1 className = "tw-text-white tw-text-2xl tw-font-bold tw-mb-4">My Posts</h1>
-      <div className="tw-flex">
+    <main>
+      <TopNav />
+      <div className='container-row tw-flex'>
+        <SideNav />
+        <div className='tw-text-white tw-flex-grow tw-mx-4 tw-flex tw-flex-col tw-h-full tw-overflow-y-auto'>
+          <div ref={dummy}></div>
+          <div className="titleBar tw-flex tw-sticky tw-top-0 tw-mb-4 tw-p-2">
+              <h1 className="tw-text-white tw-text-2xl tw-font-bold">Forum</h1>
+              <button onClick={handleScrollTop} className="tw-absolute tw-mt-2 tw-right-0 tw-text-white">Back to Top</button>
+          </div>
+          
+          <div className="tw-flex tw-divide-4">
         <Link to="/forum" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
           Main
         </Link>
-        <Link to="/home" className="tw-text-white hover:tw-text-gray-300 tw-mr-4">
-          Home
-        </Link>
-        <div
-          className="login tw-text-white tw-cursor-pointer"
-          onClick={handleLogout}
-        >
-          Logout
-        </div>
       </div>
       {posts.length === 0 ? (
       <p>You have not posted anything yet. Make a post now!</p>
@@ -61,6 +62,8 @@ function MyPosts() {
       posts.map((post) => <Post key={post.id} post={post} />)
     )}
     </div>
+    </div>
+    </main>
   );
 }
 
