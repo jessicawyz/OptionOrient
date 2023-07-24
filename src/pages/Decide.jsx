@@ -19,7 +19,6 @@ const Decide = () => {
   const [showModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [decisionName, setDecisionName] = useState('');
-  const [showDecisionNameInput, setShowDecisionNameInput] = useState(false);
   const [currentDecision, setCurrentDecision] = useState(null);
   const [weights, setWeights] = useState([]);
   var addFav = false;
@@ -38,7 +37,6 @@ const Decide = () => {
           name: decisionName,
           options: options,
         };
-        setCurrentDecision(decision);
       }
     } catch(e) {
       console.log('Error retrieving history' + e.message);
@@ -57,7 +55,6 @@ const Decide = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!decisionName) {
-      setErrorMessage('Please add a decision name first');
       return;
     }
     if (optionInput.trim() !== '' && optionInput.trim() !== ' ') {
@@ -214,9 +211,6 @@ const Decide = () => {
     setShowModal(false);
   };
 
-  const handleCancel = () => {
-    setShowDecisionNameInput(false);
-  };
   
 
   const clearAllOptions = () => {
@@ -230,31 +224,12 @@ const Decide = () => {
   };
 
   const handleConfirmDecisionName = () => {
-    if (decisionName.trim() === '') {
+    /*if (decisionName.trim() === '') {
       setErrorMessage('Please enter a decision name');
       return;
-    }
-
-    const decision = {
-      name: decisionName,
-      options: options,
-    };
-    setCurrentDecision(decision);
-    setShowDecisionNameInput(false);
+    }*/
   };
 
-
-  const deleteDecision = () => {
-    if (!currentDecision) {
-      setErrorMessage('Please select a decision to delete');
-      return;
-    }
-
-    setCurrentDecision(null);
-    setOptions([]);
-    setWeights([]);
-    setDecisionName(null);
-  };
 
   const deleteOption = (option) => {
     const optionIndex = options.indexOf(option);
@@ -292,10 +267,6 @@ const Decide = () => {
     setWeights(updatedWeights);
   };
 
-  const addNewDecision = () => {
-    setShowDecisionNameInput(true);
-  };
-
   function addFavorite(event) {
     if (event.target.checked) {
       addFav = true;
@@ -310,29 +281,19 @@ const Decide = () => {
     <div className='container-row centerAlign'>
       <SideNav />
       <div className='container-col choiceArea'>
-
-        <div className='decideForm'>
-          <form onSubmit={handleSubmit}>
-            <div className='tw-flex tw-flex-row tw-py-2 tw-text-xl'>
-              <input
-                value={optionInput}
-                onChange={handleOptionInput}
-                className='tw-ml-1 tw-flex-1 tw-bg-transparent tw-p-3 tw-text-white tw-mr-5 tw-placeholder-white tw-placeholder-opacity-100 tw-placeholder:font-bold'
-                type='text'
-                placeholder='Enter Option'
-              />
-
-              <button type='submit' className='light tw-flex-grow-0 tw-w-32 tw-py-2 tw-px-4 tw-text-black'>
-              Add
-              </button>
-            </div>
-            <div>
-            {errorMessage && optionInput !== '' && <p className='tw-text-red-500'>{errorMessage}</p>} 
-            {errorMessage && optionInput === '' && <p className='tw-text-red-500'>{errorMessage}</p>} 
-              </div>
-            
-          </form>
+        <div className='tw-flex tw-flex-row tw-py-2 tw-text-xl'>
+            <input
+              value={decisionName}
+              onChange={handleDecisionNameInput}
+              className='tw-ml-1 tw-flex-1 tw-bg-transparent tw-p-3 tw-text-white tw-placeholder-white tw-placeholder-opacity-100 tw-font-semibold tw-font-xl tw-placeholder:font-bold'
+              type='text'
+              placeholder='Add a decision name!'
+            />
         </div>
+        {(!decisionName || decisionName.trim() === '') && (
+        <p className='tw-text-red-500'>You need to enter a decision name</p>
+      )}
+      
 
         <div className="section choiceBox tw-flex tw-flex-col">
           <div className='tw-flex tw-flex-row tw-py-2'>
@@ -362,17 +323,31 @@ const Decide = () => {
           </button>
         </div>
       </div>
+
+
+      
         
-      <div className="container-col centerButton section">
-      <h2 className='tw-text-xl tw-py-2 tw-font-bold tw-text-white'>Decision Name: {decisionName}</h2>
-      <button className='light tw-py-2 tw-w-40 tw-my-5 tw-px-4 tw-text-black' onClick={addNewDecision}>
-          Add Decision Name
-        </button>
-        {currentDecision && (
-          <button className='dark tw-py-2 tw-w-40 tw-px-4 tw-bg-red-500 tw-text-white' onClick={deleteDecision}>
-            Clear Decision
-          </button>
-        )}
+      <div className="container-col centerButton tw-basis-1/4 tw-mt-6">
+          <form onSubmit={handleSubmit}>
+            <div className='tw-flex tw-flex-row tw-py-4 tw-text-xl'>
+              <input
+                value={optionInput}
+                onChange={handleOptionInput}
+                className='tw-bg-transparent tw-p-3 tw-text-white tw-ml-10 tw-placeholder-white tw-placeholder-opacity-100 tw-placeholder:font-bold'
+                type='text'
+                placeholder='Enter Option'
+              />
+
+              <button type='submit' className='light tw-flex-grow tw-w-20 tw-ml-2 tw-py-2 tw-px-4 tw-text-black'>
+              Add
+              </button>
+            </div>
+            <div>
+            {errorMessage && decisionName !== "" && optionInput !== '' && <p className='tw-text-red-500 tw-ml-12 '>{errorMessage}</p>} 
+            {errorMessage && optionInput === '' && <p className='tw-ml-12 tw-text-red-500'>{errorMessage}</p>} 
+              </div>
+            
+          </form>
 
         <button onClick={generateRandomResult} className='clickable generate'>
           Make the decision!
@@ -392,29 +367,6 @@ const Decide = () => {
           </div>
         </div>
       )}
-
-{showDecisionNameInput && (
-  <div className='tw-fixed tw-inset-0 tw-flex tw-items-center tw-justify-center tw-bg-gray-800 tw-bg-opacity-75'>
-    <div className='tw-bg-white tw-p-6 tw-rounded-lg'>
-      <h3 className='tw-text-lg tw-font-medium tw-mb-4'>Enter Decision Name</h3>
-      <input
-        value={decisionName}
-        onChange={handleDecisionNameInput}
-        className='tw-border tw-p-3'
-        type='text'
-      />
-      {errorMessage && (!decisionName || decisionName.trim() === '') && (
-        <p className='tw-text-red-500'>You need to enter a decision name</p>
-      )}
-      <button className='tw-mt-4 tw-py-2 tw-px-4 tw-bg-blue-500 tw-text-white' onClick={handleConfirmDecisionName}>
-        Confirm
-      </button>
-      <button className='tw-mt-4 tw-py-2 tw-px-4 tw-bg-red-500 tw-text-white' onClick={handleCancel}>
-        Cancel
-      </button>
-    </div>
-  </div>
-)}
     </div>
     </div>
   );

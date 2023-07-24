@@ -48,7 +48,7 @@ export default function ChatList() {
                 const friendSnap = await getDoc(friendRef);
                 const unreadRef = doc(firestore, `${username}`, 'chats', 'active', `${document.id}`);
                 const unreadSnap = await getDoc(unreadRef);
-                return { displayName: document.id, photoURL: friendSnap.photoURL, unread: unreadSnap.data().unread || 0 };
+                return { displayName: document.id, photoURL: friendSnap.data().photoURL, unread: unreadSnap.data().unread || 0 };
               });
           
               const chatArray = await Promise.all(promises);

@@ -183,7 +183,7 @@ function Post({ post, handleSearchTag }) {
       {post.tag && post.tag.length > 0 ? (
         <span className="tw-flex tw-flex-wrap tw-items-center">
         {post.tag.map((tag, index) => (
-          <span key={index} className="tw-mr-1 tw-text-white">
+          <span key={index} className="tag tw-mt-2 tw-text-white tw-ms-2 tw-p-1 tw-flex tw-items-center tw-rounded-full tw-px-2">
             {tag.content}
           </span>
         ))}

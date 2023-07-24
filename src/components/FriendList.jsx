@@ -71,14 +71,14 @@ export default function FriendList() {
         {friendList.map((friend, index) => (
           <li key={index} className="tw-flex tw-flex-row tw-justify-between tw-gap-x-6 tw-py-5">
             <div className="tw-flex tw-gap-x-4">
-              <Avatar alt="Friend profile" sx={{ width: 50, height: 50 }} src={friend.photoUrl} />
+              <Avatar alt="Friend profile" sx={{ width: 50, height: 50 }} src={friend.photoURL} />
               <div className="tw-min-w-0 tw-flex-auto">
                 <div className="tw-text-lg tw-text-white">{friend.username}</div>
                 <p className="tw-mt-1 tw-truncate tw-text-xs tw-leading-5 tw-text-gray-500">{friend.email}</p>
               </div>
             </div>
             <div>
-              <Link to="/chats" state={{ photoUrl: friend.photoUrl, friend: friend.username }}> <QuestionAnswerIcon className='tw-text-white tw-basis-1/6'></QuestionAnswerIcon> </Link>
+              <Link to="/chats" state={{ photoUrl: friend.photoURL, friend: friend.username }}> <QuestionAnswerIcon className='tw-text-white tw-basis-1/6'></QuestionAnswerIcon> </Link>
               <DeleteForeverIcon onClick={() => deleteFriend(friend)}className='tw-text-white tw-text-2xl tw-ml-4 tw-cursor-pointer' />
             </div>
           </li>

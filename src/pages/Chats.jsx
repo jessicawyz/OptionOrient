@@ -35,7 +35,7 @@ export default function Chats() {
         if (data) {
           setOpenChat(true);
           setCurrFriend(data.friend);
-          setFriendPhoto(data.PhotoURL);
+          setFriendPhoto(data.photoURL);
           getChatHistory();
           window.history.replaceState({}, document.title);
         }

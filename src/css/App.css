@@ -103,6 +103,12 @@ div.sideNav {
   cursor: pointer;
 }
 
+.decideButton {
+  font-family: "League Spartan";
+  background-color: #182b37;
+  color: white;
+  border-radius: 7px;
+}
 
 button.clickable {
   font-size: 3.6vh;
