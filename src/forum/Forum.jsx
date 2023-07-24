@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Post from './Post';
-import { collection, onSnapshot, addDoc, query, where, doc, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot, addDoc, query, where, doc, getDocs, updateDoc } from 'firebase/firestore';
 import { firestore } from '../firebase';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
@@ -54,7 +54,7 @@ function Forum() {
     if (newPostTitle && newPostContent) {
       const postsCollection = collection(firestore, 'posts');
   
-      await addDoc(postsCollection, {
+      const newDocRef = await addDoc(postsCollection, {
         title: newPostTitle,
         content: newPostContent,
         comments: [],
@@ -64,8 +64,17 @@ function Forum() {
         userId: user.uid,
         createdAt: new Date(), // to sort the posts in creation time
         tag: [],
+        postId: "",
       });
-  
+
+      const newId = newDocRef.id;
+      console.log(newId);
+
+      const newRef = doc(firestore, 'posts', `${newId}`);
+      await updateDoc(newRef, {
+        postId: `${newId}`
+      })
+      
       setNewPostTitle('');
       setNewPostContent('');
     }
@@ -94,7 +103,6 @@ function Forum() {
   };
   
   function handleScrollTop() {
-    console.log("scroll");
     dummy.current.scrollIntoView({ behavior: 'smooth' });
 
   }
@@ -105,7 +113,7 @@ function Forum() {
       <TopNav />
       <div className='container-row centerAlign'>
         <SideNav />
-        <div className='tw-text-white tw-flex-grow tw-mx-4 tw-flex tw-flex-col tw-h-full tw-overflow-y-auto'>
+        <div className='tw-flex-grow tw-mx-4 tw-flex tw-flex-col tw-h-full tw-overflow-y-auto'>
           <div ref={dummy}></div>
           <div className="titleBar tw-flex tw-sticky tw-top-0 tw-mb-4 tw-p-2">
               <h1 className="tw-text-white tw-text-2xl tw-font-bold">Forum</h1>
@@ -121,24 +129,10 @@ function Forum() {
               Sort by Likes
             </Link>
 
-            <div>
-            <input
-              type="text"
-              className="tw-text-black"
-              value={searchTagContent}
-              onChange={(e) =>
-                setSearchTagContent(e.target.value)}
-            />
+            <div className='tw-flex tw-flex-row-reverse tw-flex-grow tw-h-10 tw-h-min'>
+            
             <button
-              className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-              onClick={() => {handleSearchTag();
-                setIsSearching(true);
-              }}
-            >
-              Search
-            </button>
-            <button
-              className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
+              className="tw-bg-gray-800 hover:tw-bg-gray-600 tw-px-4 tw-py-2 tw-rounded-sm tw-ms-2 tw-text-white"
               onClick={() => {
                 setSearchTagContent('');
                 handleClearSearch();
@@ -146,6 +140,23 @@ function Forum() {
             >
               Clear
             </button>
+
+            <button
+              className="tw-bg-gray-800 hover:tw-bg-gray-600 tw-px-4 tw-py-2 tw-rounded-sm tw-ms-2 tw-text-white"
+              onClick={() => {handleSearchTag();
+                setIsSearching(true);
+              }}
+            >
+              Search
+            </button>
+
+            <input
+              type="text"
+              className="tw-text-black tw-rounded-sm tw-bg-white"
+              value={searchTagContent}
+              onChange={(e) =>
+                setSearchTagContent(e.target.value)}
+            />
           </div>
 
           </div>
