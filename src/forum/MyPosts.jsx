@@ -16,22 +16,25 @@ function MyPosts() {
 
 
   useEffect(() => {
-    if (user.uid) {
+    // Check if the user is logged in before proceeding
+    if (user && user.uid) {
       const fetchPosts = async () => {
         const postsCollection = collection(firestore, 'posts');
         const userPostsQuery = query(postsCollection, where('userId', '==', user.uid));
-  
         const unsubscribe = onSnapshot(userPostsQuery, (snapshot) => {
-          const postsData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-          setPosts(postsData);
+          const posts = snapshot.docs.map((doc) => doc.data());
+          setPosts(posts);
         });
   
-        return unsubscribe;
+        return () => {
+          unsubscribe();
+        };
       };
   
       fetchPosts();
     }
   }, [user]);
+  
 
   function handleScrollTop() {
     console.log("scroll");
@@ -47,7 +50,7 @@ function MyPosts() {
         <div className='tw-text-white tw-flex-grow tw-mx-4 tw-flex tw-flex-col tw-h-full tw-overflow-y-auto'>
           <div ref={dummy}></div>
           <div className="titleBar tw-flex tw-sticky tw-top-0 tw-mb-4 tw-p-2">
-              <h1 className="tw-text-white tw-text-2xl tw-font-bold">Forum</h1>
+              <h1 data-testid="forum-title"  className="tw-text-white tw-text-2xl tw-font-bold">Forum</h1>
               <button onClick={handleScrollTop} className="tw-absolute tw-mt-2 tw-right-0 tw-text-white">Back to Top</button>
           </div>
           
@@ -57,7 +60,7 @@ function MyPosts() {
         </Link>
       </div>
       {posts.length === 0 ? (
-      <p>You have not posted anything yet. Make a post now!</p>
+      <p data-testid="no-posts-message">You have not posted anything yet. Make a post now!</p>
     ) : (
       posts.map((post) => <Post key={post.id} post={post} />)
     )}

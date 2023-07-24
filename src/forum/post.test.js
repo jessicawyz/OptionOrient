@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
+import '@testing-library/jest-dom/extend-expect';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { UserAuth } from '../context/AuthContext';
 import Post from './Post';
@@ -72,5 +73,21 @@ describe('Post Component', () => {
 
     const deleteButton = getByTestId('delete-button');
     fireEvent.click(deleteButton);
+  });
+
+  test('displays the correct title and content', () => {
+    render(
+      <Router>
+        <Post post={mockPost} />
+      </Router>
+    );
+
+    const titleElement = screen.getByTestId('post-title');
+    expect(titleElement).toBeInTheDocument();
+    expect(titleElement).toHaveTextContent(mockPost.title);
+
+    const contentElement = screen.getByTestId('post-content');
+    expect(contentElement).toBeInTheDocument();
+    expect(contentElement).toHaveTextContent(mockPost.content);
   });
 });

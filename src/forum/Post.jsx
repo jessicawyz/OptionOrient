@@ -152,7 +152,7 @@ function Post({ post, handleSearchTag }) {
       </div>
     )}
 
-    <Typography variant="h5" className='tw-font-bold tw-text-white tw-mb-4' component="div">
+    <Typography data-testid="post-title" variant="h5" className='tw-font-bold tw-text-white tw-mb-4' component="div">
       {post.title.length > 40 ? 
         (
           `${post.title.substring(0, 40)}...`
@@ -161,7 +161,7 @@ function Post({ post, handleSearchTag }) {
         )}
     </Typography>
 
-    <Typography sx={{ mb: 1.5 }} className='tw-text-gray-400'>
+    <Typography data-testid="post-content" sx={{ mb: 1.5 }} className='tw-text-gray-400'>
       {post.content.length > 400 ? 
         (`${post.content.substring(0, 400)}...`) : (
           `${post.content}`
