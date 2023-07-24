@@ -182,15 +182,11 @@ function Post({ post, handleSearchTag }) {
 
       {post.tag && post.tag.length > 0 ? (
         <span className="tw-flex tw-flex-wrap tw-items-center">
-          {post.tag.map((tag, index) => (
-            <span
-              key={index}
-              className="tag tw-mt-2 tw-text-white tw-ms-2 tw-p-1 tw-flex tw-items-center tw-rounded-full tw-px-2"
-              onClick={() => handleTagClick(tag)}
-            >
-              {tag.content}
-            </span>
-          ))}
+        {post.tag.map((tag, index) => (
+          <span key={index} className="tw-mr-1 tw-text-white">
+            {tag.content}
+          </span>
+        ))}
         </span>
       ) : (
         <p className="tw-mt-2 tw-ms-1 tw-p-1 tw-flex tw-items-center tw-text-gray-300">
@@ -199,7 +195,7 @@ function Post({ post, handleSearchTag }) {
       )}
     </div>
   </CardContent>
-</Card>
+  </Card>
 
       </Link>
 
