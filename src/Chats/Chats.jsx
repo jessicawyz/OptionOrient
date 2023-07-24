@@ -3,9 +3,9 @@ import '../css/Chats.css';
 
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
-import ChatList from '../components/ChatList';
+import ChatList from '../Chats/ChatList';
 import { useLocation } from 'react-router-dom';
-import FriendList from '../components/FriendList';
+import FriendList from '../Chats/FriendList';
 import { firestore, auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';

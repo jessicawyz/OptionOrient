@@ -2,7 +2,7 @@ import {React, useState, useEffect} from 'react';
 
 import SideNav from "../components/SideNav";
 import TopNav from "../components/TopNav";
-import FriendList from '../components/FriendList';
+import FriendList from '../Chats/FriendList';
 import { firestore, auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { doc, getDoc, setDoc, collection, query, getDocs, orderBy, deleteDoc } from 'firebase/firestore';

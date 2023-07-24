@@ -14,8 +14,8 @@ import Profile from './components/Profile';
 import Layout from './pages/Layout';
 import Home from './pages/Home';
 import Decide from './pages/Decide';
-import Friends from './pages/Friends';
-import Chats from './pages/Chats';
+import Friends from './Chats/Friends';
+import Chats from './Chats/Chats';
 import NotFound from './pages/NotFound';
 
 function App() {
