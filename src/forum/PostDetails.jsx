@@ -24,6 +24,7 @@ export default function PostDetails() {
     const [updatingLikes, setUpdatingLikes] = useState(false);
     const [anchor, setAnchor] = useState(null);
     const [newCommentContent, setNewCommentContent] = useState("");
+    const [newTagContent, setNewTagContent] = useState('');
     const location = useLocation();
     const data = location.state;
 
@@ -146,6 +147,22 @@ export default function PostDetails() {
         }
       };
 
+      const handleCreateTag = async (e) => {
+        e.preventDefault();
+        if (newTagContent) {
+          const postDoc = doc(firestore, 'posts', post.postId);
+          const updatedTags = Array.isArray(post.tag) ? [...post.tag] : [];
+      
+          updatedTags.push({ content: newTagContent });
+      
+          await updateDoc(postDoc, {
+            tag: updatedTags,
+          });
+          setNewTagContent('');
+        }
+      };
+      
+
     return (
         <main>
             { post == null ? (<p>loading...</p>) : (
@@ -186,7 +203,7 @@ export default function PostDetails() {
                                         <div className="tw-flex tw-flex-col tw-max-h-16 tw-max-w-sm tw-overflow-y-auto">
                                             {post.tag.map((tag, index) => (
                                             <MenuItem key={index} className='tw-w-full tw-text-center'>
-                                                {tag.content}
+                                            {tag.content}
                                             </MenuItem>
                                             ))}
                                         </div>
@@ -235,6 +252,21 @@ export default function PostDetails() {
                     Add Comment
                 </button>
                 </form>
+
+                <form onSubmit={handleCreateTag}>
+          <input
+            type="text"
+            className="tw-text-black"
+            value={newTagContent}
+            onChange={(e) => setNewTagContent(e.target.value)}
+          />
+          <button
+            className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
+            type="submit"
+          >
+            Add Tag
+          </button>
+        </form>
                 
               </div>
               
