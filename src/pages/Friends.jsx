@@ -11,6 +11,7 @@ import Avatar from "@mui/material/Avatar";
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
+
 export default function Friends() {
     const [user, loading] = useAuthState(auth);
     const [requests, setRequests] = useState([]);

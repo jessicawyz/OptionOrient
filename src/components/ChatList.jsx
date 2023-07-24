@@ -2,13 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { firestore, auth } from '../firebase';
 import { collection, doc, query, getDocs, orderBy, getDoc } from 'firebase/firestore';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
-import Divider from '@mui/material/Divider';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 
 
@@ -42,8 +37,7 @@ export default function ChatList() {
 
       async function getChats() {
         if (username) {
-            
-            console.log('tried getting');
+
             const reqRef = collection(firestore, `${username}`, "chats", "active");
             const q = query(reqRef, orderBy("lastMessageTime", "desc"));
 
@@ -78,9 +72,9 @@ export default function ChatList() {
                             <Avatar alt="Friend profile" sx={{ width: 50, height: 50 }} src={friendData.photoURL} />
                             <Link to='/chats' className="tw-min-w-0 tw-flex-auto" state={{ photoURL: friendData.photoURL, friend: friendData.displayName}}>
                                 <div className="tw-text-lg tw-text-white">{friendData.displayName}</div>
-                                { friendData.unread !== 0 && (
+                                { /*friendData.unread !== 0 && (
                                     <div className='tw-text-m tw-text-white'>{friendData.unread} unread messages</div>
-                                )}
+                                )*/}
                                 
                             </Link>
                         </div>

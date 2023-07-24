@@ -67,12 +67,11 @@ export default function Chats() {
         setOpenChat(false);
     }
 
-    
-
     async function getChatHistory() {
         if (username && currFriend) {
             const msgRef = collection(firestore, `${username}`, 'chats', 'active', `${currFriend}`, 'messages');
             const q = query(msgRef, orderBy("time"));
+            
             setChatLoading(true);
 
             const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -121,6 +120,7 @@ export default function Chats() {
         setMessageInput("");
 
         try {
+            if (tempInput !== "") {
             const msgRef = doc(firestore, `${username}`, 'chats', 'active', `${currFriend}`, `messages`, `${currentDate}`);
             await setDoc(msgRef, {
                 content: tempInput,
@@ -152,7 +152,6 @@ export default function Chats() {
             let newUnread = 0;
             if (friendSnap.data() && typeof friendSnap.data().unread == 'number') {
                 newUnread = friendSnap.data().unread + 1;
-                console.log(newUnread);
             }
             
 
@@ -160,6 +159,7 @@ export default function Chats() {
                 lastMessageTime: currentDate,
                 unread: newUnread,
             })
+        }
 
 
             setDatabaseLoading(false);
