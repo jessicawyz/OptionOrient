@@ -18,6 +18,11 @@ import Friends from './pages/Friends';
 import Chats from './pages/Chats';
 import NotFound from './pages/NotFound';
 
+import Forum from './forum/Forum';
+import MyPosts from './forum/MyPosts';
+import SortLikes from './forum/SortLikes';
+import PostDetails from './forum/PostDetails'
+
 function App() {
   return (
     <AuthContextProvider>
@@ -73,6 +78,47 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            {/* Forum page */}
+            <Route
+              path="/forum"
+              element={
+                <ProtectedRoute>
+                  <Forum />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* My Posts page */}
+            <Route
+              path="/my-posts"
+              element={
+                <ProtectedRoute>
+                  <MyPosts />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Sort Likes page */}
+            <Route
+              path="/sort-likes"
+              element={
+                <ProtectedRoute>
+                  <SortLikes />
+                </ProtectedRoute>
+              }
+            />
+
+            { /*post details page*/ }
+            <Route
+              path="/post-details"
+              element={
+                <ProtectedRoute>
+                  <PostDetails />
+                </ProtectedRoute>
+              }
+            />
+
 
             <Route path="/notFound" element={<NotFound />} />
             <Route path="*" element={<NotFound />} />

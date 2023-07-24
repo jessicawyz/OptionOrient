@@ -16,6 +16,7 @@ export default function Favourites() {
 
     const [user, loading] = useAuthState(auth);
     const [username, setUsername] = useState("");
+  
     useEffect(() => {
         if (user) {
             setUsername(user.displayName);
@@ -23,6 +24,7 @@ export default function Favourites() {
     }, [user]);
 
     useEffect(() => {
+
         if (username !== "") {
             getFavs();
         }

@@ -15,8 +15,10 @@ export default function History() {
     const [fav, setFav] = useState([]);
     const [user, loading] = useAuthState(auth);
 
+
     const [username, setUsername] = useState("");
     const onSnapshotCallbackRef = useRef();
+
     useEffect(() => {
         if (user) {
             setUsername(user.displayName);
@@ -32,6 +34,7 @@ export default function History() {
             console.log("Error getting history: " + e.message);
         }
     }, [username]);
+
 
     useEffect(() => {
         return () => {
