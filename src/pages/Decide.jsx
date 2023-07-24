@@ -318,7 +318,7 @@ const Decide = () => {
               ))}
             
           </div>
-          <button onClick={clearAllOptions} className='dark clickable tw-self-center'>
+          <button onClick={clearAllOptions} className='decideButton tw-min-h-min tw-text-md clickable tw-self-center'>
             Clear All Choices
           </button>
         </div>

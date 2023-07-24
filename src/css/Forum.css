@@ -3,6 +3,9 @@
     z-index: 1400;
 }
 
+.likeButton {
+    z-index: 1399;
+}
 .topButton {
     display: flex;
     justify-content: flex-end;
@@ -19,7 +22,15 @@
     background-color: #0c1820;
 }
 
+.txtBox {
+    background-color: #0c1820 !important;
+    min-height: 50px;
+}
 .contentCard {
     background-color: #0c1820 !important;
     min-height: 200px;
+}
+
+.commentBox {
+    min-height: 100px;
 }

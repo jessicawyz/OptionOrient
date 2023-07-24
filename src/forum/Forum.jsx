@@ -142,8 +142,9 @@ function Forum() {
             <div className='tw-flex tw-flex-row-reverse tw-flex-grow tw-h-10 tw-h-min'>
               <input
                 type="text"
-                className="tw-text-black tw-rounded-sm tw-bg-white"
+                className="tw-text-black tw-rounded-sm tw-p-3 tw-bg-white"
                 value={searchTagContent}
+                placeholder='Search by Tags'
                 onChange={(e) => setSearchTagContent(e.target.value)}
               />
             </div>
@@ -174,14 +175,14 @@ function Forum() {
           {searchResultError && <p className="tw-text-red-500">No matching posts.</p>}
           <form onSubmit={handleCreatePost} className="tw-mb-4">
             <textarea
-              className="tw-text-black tw-bg-white tw-rounded tw-p-2 tw-w-full tw-mb-2 tw-min-h-min"
+              className="tw-text-white txtBox tw-rounded-sm tw-text-black tw-border-solid tw-border-2 tw-border-slate-800 tw-rounded tw-p-2 tw-w-full tw-mb-2 tw-min-h-min"
               placeholder="Post Title"
               value={newPostTitle}
               onChange={(e) => setNewPostTitle(e.target.value)}
             />
             {titleError && <p className="tw-text-red-500">Title cannot be empty.</p>} 
             <textarea
-              className="tw-text-black tw-bg-white tw-rounded tw-p-2 tw-w-full tw-h-32 tw-min-h-min"
+              className="tw-text-white txtBox tw-rounded-sm tw-text-black tw-border-solid tw-border-2 tw-border-slate-800 tw-rounded tw-p-2 tw-w-full tw-h-32 tw-min-h-min"
               value={newPostContent}
               onChange={(e) => setNewPostContent(e.target.value)}
             />

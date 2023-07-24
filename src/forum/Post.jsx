@@ -28,12 +28,12 @@ function Post({ post, handleSearchTag }) {
 
 
   const handleDeletePost = async () => {
-    const postDoc = doc(firestore, 'posts', post.id);
+    const postDoc = doc(firestore, 'posts', post.postId);
     await deleteDoc(postDoc);
   };
 
   const handleLikePost = async () => {
-    const postDoc = doc(firestore, 'posts', post.id);
+    const postDoc = doc(firestore, 'posts', post.postId);
 
     if (post.likedBy && post.likedBy.includes(user.uid)) {
       // User already liked the post, so unlike it
@@ -65,7 +65,7 @@ function Post({ post, handleSearchTag }) {
   };
 
   const handleSavePost = async () => {
-    const postDoc = doc(firestore, 'posts', post.id);
+    const postDoc = doc(firestore, 'posts', post.postId);
 
     await setDoc(postDoc, { content: editedContent }, { merge: true });
     setIsEditing(false);
@@ -79,7 +79,7 @@ function Post({ post, handleSearchTag }) {
   const handleCreateComment = async (e) => {
     e.preventDefault();
     if (newCommentContent) {
-      const postDoc = doc(firestore, 'posts', post.id);
+      const postDoc = doc(firestore, 'posts', post.postId);
 
       await updateDoc(postDoc, {
         comments: arrayUnion({ content: newCommentContent }),
@@ -92,7 +92,7 @@ function Post({ post, handleSearchTag }) {
   const handleCreateTag = async (e) => {
     e.preventDefault();
     if (newTagContent) {
-      const postDoc = doc(firestore, 'posts', post.id);
+      const postDoc = doc(firestore, 'posts', post.postId);
       await updateDoc(postDoc, {
         tag: [...post.tag, { content: newTagContent }],
       });
@@ -127,7 +127,6 @@ function Post({ post, handleSearchTag }) {
           setPhotoURL(url);
         })
         .catch((error) => {
-          // Handle errors if the profile picture is not found or other issues occur.
           console.log("Error fetching profile picture:", error);
         });
     }
@@ -135,9 +134,9 @@ function Post({ post, handleSearchTag }) {
 
   return (
     <div>
-    <Link to='/post-details' state={{post: post}}>
     <Card sx={{ minWidth: 275, minHeight: 20, zIndex: 'modal' }} className='tw-mb-6 postCard'>
   <CardContent className="tw-h-full">
+    <Link to='/post-details' state={{post: post}}>
     {photoURL && (
       <div className='tw-flex tw-flex-row'>
         <Avatar
@@ -161,15 +160,17 @@ function Post({ post, handleSearchTag }) {
         )}
     </Typography>
 
-    <Typography data-testid="post-content" sx={{ mb: 1.5 }} className='tw-text-gray-400'>
+    <Typography data-testid="post-content" sx={{ mb: 1.5 }} className='tw-text-gray-400 tw-break-words'>
       {post.content.length > 400 ? 
         (`${post.content.substring(0, 400)}...`) : (
           `${post.content}`
         )}
     </Typography>
+    </Link>
+
 
     <div className="tw-flex tw-flex-row">
-      <button data-testid="like-button" className="tw-mt-2 tw-flex tw-items-center tw-text-red-500" onClick={handleLikePost}>
+      <button data-testid="like-button" className="tw-mt-2 tw-flex tw-items-center tw-text-red-500 likeButton" onClick={handleLikePost}>
         {post.likedBy && post.likedBy.includes(user.uid) ? (
           <FaHeart size={20} />
         ) : (
@@ -197,71 +198,7 @@ function Post({ post, handleSearchTag }) {
   </CardContent>
   </Card>
 
-      </Link>
-
-      <div>
-        {isEditing ? (
-          <textarea
-            className="tw-text-black"
-            value={editedContent}
-            onChange={(e) => setEditedContent(e.target.value)}
-          />
-        ) : (
-          <p></p>
-        )}
-
-        {user.uid === post.userId && ( // Conditionally render edit and delete buttons for the logged-in user's posts
-          <div>
-            {isEditing ? (
-              <>
-                <button
-                  className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-                  onClick={handleSavePost}
-                >
-                  Save
-                </button>
-                <button
-                  className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-                  onClick={handleCancelEdit}
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <button
-                className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-                onClick={handleEditPost}
-                data-testid="edit-button"
-              >
-                Edit
-              </button>
-            )}
-            <button
-              className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-              onClick={handleDeletePost}
-              data-testid="delete-button"
-            >
-              Delete
-            </button>
-          </div>
-        )}
-
-        <form onSubmit={handleCreateTag}>
-          <input
-            type="text"
-            className="tw-text-black"
-            value={newTagContent}
-            onChange={(e) => setNewTagContent(e.target.value)}
-          />
-          <button
-            className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-            type="submit"
-          >
-            Add Tag
-          </button>
-        </form>
-
-      </div>
+      
     </div>
   );
 }

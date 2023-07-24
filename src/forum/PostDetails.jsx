@@ -11,6 +11,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
 import { useLocation } from 'react-router-dom';
+import e from 'cors';
 
 export default function PostDetails() {
     const [post, setPost] = useState(null);
@@ -31,6 +32,7 @@ export default function PostDetails() {
     const open = Boolean(anchor);
 
     const dummy = useRef();
+    console.log('rerender');
 
     useEffect(() => {
         if (user) {
@@ -38,6 +40,13 @@ export default function PostDetails() {
             setUid(user.uid);
         }
     }, [user]);
+
+    useEffect(() => {
+        // Initialize isEditingCom with false values for each comment
+        if (post && post.comments) {
+          setIsEditingCom(Array(post.comments.length).fill(false));
+        }
+      }, [post]);
 
     useEffect(() => {
         try {
@@ -171,28 +180,49 @@ export default function PostDetails() {
       };
       
       function handleEditComment(index) {
-        /*setEditedComContent(post.comments[index].content);
-        const tempArray = isEditingCom;
-        tempArray[index] = true;
-        setIsEditingCom(tempArray);*/
+        if (isEditingCom && isEditingCom.length === post.comments.length) {
+            console.log('handleedit')
+            setEditedComContent(post.comments[index].content);
+            const tempArray = [...isEditingCom];
+            tempArray[index] = true;
+            setIsEditingCom([...tempArray]);
+        }
       }
 
-      async function handleSaveComment(index) {
-        const postDoc = doc(firestore, 'posts', post.id);
-        const tempArray = post.comments;
-        tempArray[index].content = editedComContent;
+      async function handleSaveComment(e, index) {
+        e.preventDefault()
+        if (editedComContent.length !== 0) {
+            const postDoc = doc(firestore, 'posts', post.postId);
+            const tempArray = post.comments;
+            tempArray[index].content = editedComContent;
 
-        await setDoc(postDoc, { comments: tempArray });
-        const editTemp = isEditingCom;
-        editTemp[index] = false;
-        setIsEditingCom(editTemp);
+            await updateDoc(postDoc, { comments: tempArray });
+            const editTemp = isEditingCom;
+            editTemp[index] = false;
+            setIsEditingCom(editTemp);
+        } else {
+            alert('Please do not change your comment to be empty!');
+        }
 
       }
 
-      function handleCancelComment(index) {
-        const tempArray = isEditingCom;
+      function handleCancelComment(e, index) {
+        console.log('cancel');
+        e.preventDefault();
+        const tempArray = [...isEditingCom];
         tempArray[index] = false;
         setIsEditingCom(tempArray);
+      }
+
+      async function handleDeleteComment(index) {
+        const deleteRef = doc(firestore, 'posts', `${post.postId}`);
+        const docSnap = await getDoc(deleteRef);
+        const tempArray = [...docSnap.data().comments.slice(0, index), ...docSnap.data().comments.slice(index + 1)];;
+
+
+        await updateDoc(deleteRef, {
+            comments: tempArray,
+        })
       }
 
     return (
@@ -251,28 +281,51 @@ export default function PostDetails() {
                         
                 </div>
 
-                <div className='tw-border-solid tw-border-2 tw-border-slate-800 tw-rounded-md tw-p-4 tw-mb-6 tw-mt-4 contentCard tw-min-h-max'>
+                <div className='tw-border-solid tw-border-2 tw-border-slate-800 tw-rounded-md tw-p-4 tw-mb-4 tw-mt-4 contentCard tw-min-h-max'>
                         <div className="tw-h-full">
-                            <div className='tw-text-gray-200'>
+                            <div className='tw-text-gray-200 tw-break-words'>
                                 {post.content}
                             </div>
                         </div>
                 </div>
 
+                { uid === post.userId ? (
+            <div className='tw-flex tw-flex-row-reverse'>
+            <form className='' onSubmit={(e) => handleCreateTag(e, post)}>
+            <input
+                type="text"
+                className="tw-h-full tw-p-2 tw-text-black tw-bg-white txtBox tw-rounded-md tw-text-black tw-border-solid tw-border-2 tw-border-slate-800"
+                value={newTagContent}
+                onChange={(e) => setNewTagContent(e.target.value)}
+                />
+                <button
+                className="tw-border tw-border-gray-800 tw-ml-2 tw-bg-gray-800 hover:tw-bg-gray-600 tw-rounded-md tw-p-2 tw-px-6 tw-mt-2 tw-text-white"
+                type="submit"
+                >
+                Add Tag
+                </button>
+            </form>
+            </div>
+
+          ) : (
+            <span></span>
+          )}
                 <div className='tw-my-4'>
                     <div className='tw-text-white tw-tx-lg tw-mb-2 tw-font-bold tw-p-1'>Comments</div>
                     {post.comments && post.comments.length > 0 ? (
                         post.comments.map((comment, index) => (
                             <div>
-                            {isEditingCom[index] ? (
-                                <div className='contentCard tw-border-solid tw-border-2 tw-border-slate-800 tw-rounded-md tw-p-4 tw-min-h-max'>
+                            {isEditingCom && isEditingCom[index] ? (
+                                
+                                <div className='contentCard tw-border-solid tw-border-2 tw-border-slate-800 tw-text-white tw-rounded-md tw-p-4 tw-min-h-max'>
+                                    Edit Content
                                 <textarea
-                                    className="tw-text-white tw-h-full tw-w-full contentCard"
+                                    className="tw-text-white tw-h-full tw-w-full tw-mt-2 contentCard"
                                     value={editedComContent}
                                     onChange={(e) => setEditedComContent(e.target.value)}/>
                                 <div className='tw-text-slate-400 tw-w-full tw-flex tw-flex-row-reverse'>
-                                    <button className='tw-ml-6' onClick={handleCancelComment(index)}>cancel</button>
-                                    <button onClick={handleSaveComment(index)}>save</button>
+                                    <button className='tw-ml-6 ' onClick={(e) => handleCancelComment(e, index)}>cancel</button>
+                                    <button onClick={(e) => handleSaveComment(e, index)}>save</button>
                                 </div>
                                 </div>
                             ) : (
@@ -280,7 +333,11 @@ export default function PostDetails() {
                                 {comment.content}
                                 <div className='tw-w-full tw-flex tw-flex-row-reverse tw-text-sm tw-text-slate-400'>
                                     <div> | by {comment.author}</div>
-                                    {comment.author === user.displayName ? (<button onClick={() => handleEditComment(index)} className='tw-mx-2'>Edit </button>) : (<p></p>)}
+                                    {user && comment.author === user.displayName ? (
+                                        <div>
+                                        <button onClick={() => handleEditComment(index)} className='tw-mx-2'>Edit </button>
+                                        <button onClick={() => handleDeleteComment(index)} className='tw-mx-2'>Delete </button>
+                                        </div>) : (<p></p>)}
                                 </div>
                             </div>
                             )}
@@ -294,32 +351,22 @@ export default function PostDetails() {
 
                 <form onSubmit={handleCreateComment}>
                 <textarea
-                    className="tw-text-black"
+                    className="tw-text-black tw-rounded-md tw-w-full tw-p-4 commentBox"
                     value={newCommentContent}
                     onChange={(e) => setNewCommentContent(e.target.value)}
                 />
-                <button
-                    className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-                    type="submit"
-                >
-                    Add Comment
-                </button>
+                <div className='tw-flex tw-flex-row-reverse'>
+                    <button
+                        className="tw-border tw-border-gray-800 tw-rounded-md tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
+                        type="submit"
+                    >
+                        Add Comment
+                    </button>
+                </div>
+                
                 </form>
-
-                <form onSubmit={handleCreateTag}>
-          <input
-            type="text"
-            className="tw-text-black"
-            value={newTagContent}
-            onChange={(e) => setNewTagContent(e.target.value)}
-          />
-          <button
-            className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
-            type="submit"
-          >
-            Add Tag
-          </button>
-        </form>
+          
+       
                 
               </div>
               

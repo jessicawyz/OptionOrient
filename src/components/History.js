@@ -54,7 +54,6 @@ export default function History() {
             onSnapshotCallbackRef.current();
           }
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            console.log('ssldjf');
             const optionsA = [];
             const weightsA = [];
             const namesA = [];
@@ -70,7 +69,6 @@ export default function History() {
             setOptions(optionsA);
             setWeights(weightsA); 
             setFav(favA);
-            console.log(favA);
         })
 
         onSnapshotCallbackRef.current = unsubscribe;
