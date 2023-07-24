@@ -1,9 +1,11 @@
 import { React, useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { firestore, auth } from '../firebase';
-import { collection, query, getDocs, orderBy } from 'firebase/firestore';
+import { collection, query, getDocs, orderBy, deleteDoc, doc, getDoc } from 'firebase/firestore';
 import Avatar from "@mui/material/Avatar";
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
+import { Link } from 'react-router-dom';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 export default function FriendList() {
     const [user, loading] = useAuthState(auth);
@@ -26,19 +28,42 @@ export default function FriendList() {
 
     async function getFriends() {
         try {
-          const reqRef = collection(firestore, `${username}`, "info", "friends");
-          const q = query(reqRef, orderBy("time", "desc"));
-          let friendArray = [];
-          const docSnap = await getDocs(q);
-          docSnap.forEach((doc) => {
-              friendArray.push(doc.data());
-          });
+          if (username) {
+            const reqRef = collection(firestore, `${username}`, "info", "friends");
+            const q = query(reqRef, orderBy("time", "desc"));
+            let friendArray = [];
+            const docSnap = await getDocs(q);
+            docSnap.forEach((doc) => {
+                friendArray.push(doc.data());
+            });
 
-          setFriendList(friendArray);
+            setFriendList(friendArray);
+          }
         } catch(e) {
           console.log("Error getting friends in friendList: " + e.message);
         }
 
+    }
+
+    async function deleteFriend(friend) {
+      const ownRef = doc(firestore, username, "info", "friends", `${friend.username}`);
+      const document = await getDoc(ownRef);
+
+      const friendRef = doc(firestore, friend.username, 'info', 'friends', username);
+      const docSnap = await getDoc(friendRef);
+        
+        if (document.exists()) {
+            await deleteDoc(ownRef);
+        }
+
+        if (docSnap.exists()) {
+          await deleteDoc(friendRef);
+        }
+
+        alert("friend deleted successfully!");
+        window.location.reload(true);
+
+        
     }
 
     return (
@@ -52,7 +77,10 @@ export default function FriendList() {
                 <p className="tw-mt-1 tw-truncate tw-text-xs tw-leading-5 tw-text-gray-500">{friend.email}</p>
               </div>
             </div>
-            <QuestionAnswerIcon className='tw-text-white tw-basis-1/6'></QuestionAnswerIcon>
+            <div>
+              <Link to="/chats" state={{ photoUrl: friend.photoUrl, friend: friend.username }}> <QuestionAnswerIcon className='tw-text-white tw-basis-1/6'></QuestionAnswerIcon> </Link>
+              <DeleteForeverIcon onClick={() => deleteFriend(friend)}className='tw-text-white tw-text-2xl tw-ml-4 tw-cursor-pointer' />
+            </div>
           </li>
         ))}
       </ul>

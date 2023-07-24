@@ -1,0 +1,44 @@
+.chatBox {
+    background-color: #091820
+}
+
+.header {
+    background-color: #07141a
+}
+
+.message {
+    display: flex;
+    align-items: center;
+}
+
+.sent {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.receive {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.sent p {
+    color: white;
+    background: #255653;
+    
+}
+
+.receive p {
+    background: #1c343f;
+    color: white;
+}
+
+p.chat {
+    position: relative;
+    margin-bottm: 12px;
+    max-width: 500px;
+    padding: 10px 20px;
+    border-radius: 25px;
+    color: white;
+    text-align: center;
+    
+}

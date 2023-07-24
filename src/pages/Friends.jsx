@@ -11,6 +11,7 @@ import Avatar from "@mui/material/Avatar";
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
+
 export default function Friends() {
     const [user, loading] = useAuthState(auth);
     const [requests, setRequests] = useState([]);
@@ -92,14 +93,6 @@ export default function Friends() {
         setOpenReqList(false);
     }
 
-    /*
-    await setDoc(friendRef, {
-                uid: friendInfo.uid,
-                email: friendInfo.email,
-                photoURL: friendInfo.photoURL,
-                username: friendInfo.username,
-                time: currentDate,
-            });*/
     async function handleConfirm() {
         const friendRef = doc(firestore, `${friend}`, 'info', 'requests', `${username}`);
 

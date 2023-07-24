@@ -8,7 +8,7 @@ export default function SideNav() {
               <Link to='/home' className="nav"><div>Home</div></Link>
               <Link to="/notFound" className="nav"><div className="nav">Forum</div></Link>
               <Link to="/friends" className="nav"><div className="nav">Friends</div></Link>
-              <Link to="/notFound" className="nav"><div className="nav">Chats</div></Link>
+              <Link to="/chats" className="nav"><div className="nav">Chats</div></Link>
               <button className='dark clickable' onClick={() => navigate('/decide')}>Decide!</button>
           </div>
 
