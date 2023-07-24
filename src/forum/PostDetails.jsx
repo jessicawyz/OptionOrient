@@ -9,9 +9,6 @@ import Avatar from "@mui/material/Avatar";
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import { Typography } from '@mui/material';
 
 import { useLocation } from 'react-router-dom';
 
@@ -19,12 +16,15 @@ export default function PostDetails() {
     const [post, setPost] = useState(null);
     const [postId, setPostID] = useState([]);
     const [user, loading] = useAuthState(auth);
+    const [uid, setUid] = useState("");
     const [username, setUsername] = useState("");
     const [authorURL, setAuthorURL] = useState("");
     const [updatingLikes, setUpdatingLikes] = useState(false);
     const [anchor, setAnchor] = useState(null);
     const [newCommentContent, setNewCommentContent] = useState("");
     const [newTagContent, setNewTagContent] = useState('');
+    const [isEditingCom, setIsEditingCom] = useState([]);
+    const [editedComContent, setEditedComContent] = useState(""); 
     const location = useLocation();
     const data = location.state;
 
@@ -35,20 +35,34 @@ export default function PostDetails() {
     useEffect(() => {
         if (user) {
             setUsername(user.displayName);
+            setUid(user.uid);
         }
     }, [user]);
 
     useEffect(() => {
         try {
           if (data) {
-            console.log(data.post.likedBy);
-            setPost(data.post)
+            setPost(data.post);
             setPostID(data.postId);
           }
         } catch(e) {
           console.log('Error getting post details' + e.message);
         }
       }, [user]);
+
+      useEffect(() => {
+        const savedPost = JSON.parse(localStorage.getItem('post'));
+        if (savedPost) {
+            setPost(savedPost);
+        }
+    }, []);
+
+      useEffect(() => {
+        if (post) {
+            localStorage.setItem('post', JSON.stringify(post));
+        }
+        }, [post]);
+
 
 
       useEffect(() => {
@@ -75,14 +89,12 @@ export default function PostDetails() {
     }, [data]);
 
     const handleLikePost = async () => {
-        console.log('update likes');
-        console.log(post)
         setUpdatingLikes(true);
         const postDoc = doc(firestore, 'posts', post.postId);
     
-        if (post.likedBy && post.likedBy.includes(user.uid)) {
+        if (post.likedBy && post.likedBy.includes(uid)) {
           // User already liked the post, so unlike it
-          const updatedLikedBy = post.likedBy.filter((userId) => userId !== user.uid);
+          const updatedLikedBy = post.likedBy.filter((userId) => userId !== uid);
     
           await updateDoc(postDoc, {
             likedBy: updatedLikedBy,
@@ -96,7 +108,7 @@ export default function PostDetails() {
             updatedLikedBy = post.likedBy.slice();
           }
     
-          updatedLikedBy.push(user.uid);
+          updatedLikedBy.push(uid);
     
           await updateDoc(postDoc, {
             likedBy: updatedLikedBy,
@@ -122,10 +134,6 @@ export default function PostDetails() {
         return authorURL;
       }
 
-      async function handleTagClick() {
-
-      }
-
       function handleClose() {
         setAnchor(null);
       }
@@ -140,7 +148,7 @@ export default function PostDetails() {
           const postDoc = doc(firestore, 'posts', post.postId);
     
           await updateDoc(postDoc, {
-            comments: arrayUnion({ content: newCommentContent }),
+            comments: arrayUnion({ author: user.displayName, content: newCommentContent }),
           });
     
           setNewCommentContent('');
@@ -162,6 +170,30 @@ export default function PostDetails() {
         }
       };
       
+      function handleEditComment(index) {
+        /*setEditedComContent(post.comments[index].content);
+        const tempArray = isEditingCom;
+        tempArray[index] = true;
+        setIsEditingCom(tempArray);*/
+      }
+
+      async function handleSaveComment(index) {
+        const postDoc = doc(firestore, 'posts', post.id);
+        const tempArray = post.comments;
+        tempArray[index].content = editedComContent;
+
+        await setDoc(postDoc, { comments: tempArray });
+        const editTemp = isEditingCom;
+        editTemp[index] = false;
+        setIsEditingCom(editTemp);
+
+      }
+
+      function handleCancelComment(index) {
+        const tempArray = isEditingCom;
+        tempArray[index] = false;
+        setIsEditingCom(tempArray);
+      }
 
     return (
         <main>
@@ -185,7 +217,7 @@ export default function PostDetails() {
                         <div className='tw-flex tw-flex-row-reverse'>
                         <div className='tw-flex tw-flex-row-reverse tw-w-1/3'>
                         <button className="tw-mt-2 tw-flex tw-items-center tw-text-red-500" onClick={handleLikePost}>
-                            {post.likedBy && post.likedBy.includes(user.uid) ? (
+                            {post.likedBy && post.likedBy.includes(uid) ? (
                                 <FaHeart size={20} />
                             ) : (
                                 <FaRegHeart size={20} />
@@ -201,11 +233,11 @@ export default function PostDetails() {
                                 >
                                     {post.tag && post.tag.length > 0 ? (
                                         <div className="tw-flex tw-flex-col tw-max-h-16 tw-max-w-sm tw-overflow-y-auto">
-                                            {post.tag.map((tag, index) => (
+                                            { post.tag.map((tag, index) => (
                                             <MenuItem key={index} className='tw-w-full tw-text-center'>
                                             {tag.content}
                                             </MenuItem>
-                                            ))}
+                                            )) }
                                         </div>
                                         ) : (
                                             <MenuItem>no tags added</MenuItem>
@@ -227,12 +259,33 @@ export default function PostDetails() {
                         </div>
                 </div>
 
-                <div>
+                <div className='tw-my-4'>
+                    <div className='tw-text-white tw-tx-lg tw-mb-2 tw-font-bold tw-p-1'>Comments</div>
                     {post.comments && post.comments.length > 0 ? (
-                        post.comments.map((comment) => (
-                            <div key={comment.id} className='tw-text-white'>
+                        post.comments.map((comment, index) => (
+                            <div>
+                            {isEditingCom[index] ? (
+                                <div className='contentCard tw-border-solid tw-border-2 tw-border-slate-800 tw-rounded-md tw-p-4 tw-min-h-max'>
+                                <textarea
+                                    className="tw-text-white tw-h-full tw-w-full contentCard"
+                                    value={editedComContent}
+                                    onChange={(e) => setEditedComContent(e.target.value)}/>
+                                <div className='tw-text-slate-400 tw-w-full tw-flex tw-flex-row-reverse'>
+                                    <button className='tw-ml-6' onClick={handleCancelComment(index)}>cancel</button>
+                                    <button onClick={handleSaveComment(index)}>save</button>
+                                </div>
+                                </div>
+                            ) : (
+                                <div key={comment.id} className='tw-mb-4 tw-text-white contentCard tw-border-solid tw-border-2 tw-border-slate-800 tw-rounded-md tw-p-4 tw-min-h-max'>
                                 {comment.content}
+                                <div className='tw-w-full tw-flex tw-flex-row-reverse tw-text-sm tw-text-slate-400'>
+                                    <div> | by {comment.author}</div>
+                                    {comment.author === user.displayName ? (<button onClick={() => handleEditComment(index)} className='tw-mx-2'>Edit </button>) : (<p></p>)}
+                                </div>
                             </div>
+                            )}
+                            </div>
+                            
                         ))
                     ) : (
                         <p className='tw-text-white'>No comments yet!</p>
