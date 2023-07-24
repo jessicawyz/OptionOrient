@@ -141,8 +141,7 @@ function Forum() {
               className="tw-border tw-border-gray-800 tw-bg-gray-800 hover:tw-bg-gray-600 tw-p-4 tw-mt-2 tw-text-white"
               onClick={() => {
                 setSearchTagContent('');
-                handleSearchTag(''); 
-                setIsSearching(false);
+                handleClearSearch();
               }}
             >
               Clear
