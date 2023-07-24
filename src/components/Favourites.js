@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from 'react';
 import '../css/Home.css';
 import { firestore, auth } from '../firebase';
-import { getDocs, setDoc, updateDoc, doc, getDoc, collection, orderBy, query, limit, deleteDoc } from "firebase/firestore";
+import { getDocs, setDoc, updateDoc, doc, getDoc, collection, orderBy, query, limit, deleteDoc, onSnapshot } from "firebase/firestore";
 import { Link } from 'react-router-dom';
 import Checkbox from '@mui/material/Checkbox';
 import FavoriteBorder from '@mui/icons-material/FavoriteBorder';
@@ -9,17 +9,14 @@ import Favorite from '@mui/icons-material/Favorite';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 export default function Favourites() {
-    const optionsA = [];
-    const weightsA = [];
-    const namesA = [];
     
     const [options, setOptions] = useState([]);
     const [weights, setWeights] = useState([]);
     const [names, setNames] = useState([]);
-    //const user = UserAuth();
 
     const [user, loading] = useAuthState(auth);
-    const [username, setUsername] = useState(null);
+    const [username, setUsername] = useState("");
+  
     useEffect(() => {
         if (user) {
             setUsername(user.displayName);
@@ -27,21 +24,33 @@ export default function Favourites() {
     }, [user]);
 
     useEffect(() => {
-        getFavs();
+
+        if (username !== "") {
+            getFavs();
+        }
     }, [username]);
 
     async function getFavs() {
         const favRef = collection(firestore, `${username}`, "decision", "favourites");
-        const q = await query(favRef, orderBy("time", "desc"), limit(50));
-        const docSnap = await getDocs(q);
-            docSnap.forEach((doc) => {
+        const q = query(favRef, orderBy("time", "desc"), limit(50));
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const optionsA = [];
+            const weightsA = [];
+            const namesA = [];
+            snapshot.forEach((doc) => {
                 namesA.push(doc.id);
                 optionsA.push(doc.data().options);
                 weightsA.push(doc.data().weights); 
+            });
+            setNames(namesA);
+            setOptions(optionsA);
+            setWeights(weightsA); 
         });
-        setNames(namesA);
-        setOptions(optionsA);
-        setWeights(weightsA); 
+
+        return () => unsubscribe();
+
+
     }
 
     function changeFav(event, index) {
@@ -82,14 +91,16 @@ export default function Favourites() {
         const faveRef = doc(firestore, username, "decision", "favourites", `${name}`);
         const historyRef = doc(firestore, username, `decision`, `history`, `${name}`);
         const document = await getDoc(faveRef);
-        
-        if (document.exists()) {
-            await deleteDoc(faveRef);
-        }
 
-        await updateDoc(historyRef, {
-            favorite: false,
-        });
+    
+        if (document.exists()) {
+            await Promise.all([
+                updateDoc(historyRef, {
+                favorite: false,
+                }),
+                deleteDoc(faveRef),
+            ]);
+        }
       }
     
     return (
@@ -98,7 +109,7 @@ export default function Favourites() {
             <div className="tw-overflow-y-auto tw-overflow-x-hidden choiceList tw-w-full">
                 {names.map((name, index) => (
                     <div className="tw-flex-col">
-                        <div key={index} className='tw-flex tw-flex-row tw-items-center'>
+                        <div key={name} className='tw-flex tw-flex-row tw-items-center'>
                             <Link to='/decide' state={{ name: names[index],
                                                         options: options[index],
                                                         weights: weights[index]}}
