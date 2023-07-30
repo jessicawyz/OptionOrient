@@ -9,7 +9,7 @@ import FriendList from '../components/FriendList';
 import { firestore, auth } from '../firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { useCollectionData } from 'react-firebase-hooks/firestore';
-import { doc, getDoc, setDoc, collection, query, getDocs, orderBy, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, query, getDocs, orderBy, onSnapshot, addDoc, Timestamp } from 'firebase/firestore';
 import Avatar from '@mui/material/Avatar';
 
 import ClickAwayListener from '@mui/base/ClickAwayListener';
@@ -116,23 +116,25 @@ export default function Chats() {
         var currentDate = `${year}-${month}-${day} ` + time;
         setDatabaseLoading(true);
 
+
         const tempInput = messageInput;
         setMessageInput("");
 
+        
         try {
-            if (tempInput !== "") {
-            const msgRef = doc(firestore, `${username}`, 'chats', 'active', `${currFriend}`, `messages`, `${currentDate}`);
-            await setDoc(msgRef, {
+            if (tempInput !== "" && tempInput.trim().length !== 0) {
+            const msgRef = collection(firestore, `${username}`, 'chats', 'active', `${currFriend}`, `messages`);
+            await addDoc(msgRef, {
                 content: tempInput,
-                time: currentDate,
+                time: Timestamp.now().toMillis(),
                 author: username,
                 unread: false,
             })
 
-            const friendRef = doc(firestore, `${currFriend}`, 'chats', 'active', `${username}`, `messages`, `${currentDate}`);
-            await setDoc(friendRef, {
+            const friendRef = collection(firestore, `${currFriend}`, 'chats', 'active', `${username}`, `messages`);
+            await addDoc(friendRef, {
                 content: tempInput,
-                time: currentDate,
+                time: Timestamp.now().toMillis(),
                 author: username,
                 unread: true,
             })

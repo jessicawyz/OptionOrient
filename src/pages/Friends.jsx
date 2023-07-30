@@ -181,6 +181,11 @@ export default function Friends() {
         }
 
     }
+
+    function handleSearchFriend() {
+        setOpenReqList(false);
+        setOpenSearch(true)
+    }
     return (
           <main>
             <div className='container-row tw-flex'>
@@ -189,7 +194,7 @@ export default function Friends() {
                 <div className='tw-flex tw-flex-row'>
                     <p className='tw-font-medium tw-text-3xl tw-text-white'>Friends</p>
                     <button className="tw-ml-4 tw-p-2 light" onClick={handleGetID}>Copy Username</button>
-                    <button className="tw-ml-4 tw-p-2 light" onClick={() => setOpenSearch(true)}>Add a Friend</button>
+                    <button className="tw-ml-4 tw-p-2 light" onClick={handleSearchFriend}>Add a Friend</button>
                     <Badge badgeContent={requests.length} color='primary' className="tw-mt-2 tw-mx-4" onClick={() => setOpenReqList(true)}>
                         <NotificationsIcon fontSize='medium' className='tw-text-white'></NotificationsIcon>
                     </Badge>
@@ -260,7 +265,12 @@ export default function Friends() {
                 </div>
             )}
 
-            {openReqList && requests.length === 0 && alert("You have no pending requests!")}
+            {requests.length === 0 && openReqList ? (
+                <div>
+                    { setOpenReqList(false) }
+                    { alert("You have no pending requests") }
+                </div>
+            ) : (<></>)}
 
         </main>
 
